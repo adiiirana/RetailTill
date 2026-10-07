@@ -1,0 +1,5 @@
+UPDATE DBVersion
+SET ispost = 0
+
+ALTER TABLE TempDiscountID
+ALTER COLUMN ID INT NOT NULL;

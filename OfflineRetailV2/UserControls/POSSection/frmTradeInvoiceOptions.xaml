@@ -1,0 +1,86 @@
+<Window x:Class="OfflineRetailV2.UserControls.POSSection.frmTradeInvoiceOptions"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cc="clr-namespace:OfflineRetailV2.Controls"
+        Title="Invoice Options" Width="780" Height="350"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="AccentGreen" Color="#e28f1e"/>
+        <SolidColorBrush x:Key="AccentBlue" Color="#3db6eb"/>
+        <SolidColorBrush x:Key="AccentRed" Color="#29bf6a"/>
+
+        <Style x:Key="BaseOrderButtonStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="110"/>
+            <Setter Property="Width" Value="190"/>
+            <Setter Property="Margin" Value="12"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="6"
+                                Background="{TemplateBinding Background}"
+                                SnapsToDevicePixels="True"
+                                Padding="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="FontSize" Value="20"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="TextWrapping" Value="Wrap"/>
+                                        <Setter Property="TextAlignment" Value="Center"/>
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Color variants -->
+        <Style x:Key="GreenOrderButton" BasedOn="{StaticResource BaseOrderButtonStyle}" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentGreen}"/>
+        </Style>
+
+        <Style x:Key="BlueOrderButton" BasedOn="{StaticResource BaseOrderButtonStyle}" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentBlue}"/>
+        </Style>
+
+        <Style x:Key="RedOrderButton" BasedOn="{StaticResource BaseOrderButtonStyle}" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentRed}"/>
+        </Style>
+    </Window.Resources>
+
+    <cc:ModalWindow x:Name="ModalWindow">
+        <Border Background="{DynamicResource ModalContentBackground}" CornerRadius="18" Padding="25" SnapsToDevicePixels="True"
+                BorderBrush="#DADADA" BorderThickness="1">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <TextBlock Grid.Row="0" Text="Trade Invoice Options" FontSize="32" FontFamily="{StaticResource PoppinsExtraBold}"
+                           HorizontalAlignment="Center" Margin="0,10,0,25" Foreground="#323749"/>
+
+                <!-- Buttons Row -->
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Button Content="Email Invoice" Style="{StaticResource RedOrderButton}" FontFamily="{StaticResource PoppinsBold}"
+                            x:Name="btnEmail" Click="BtnEmail_Click"/>
+                    <Button Content="View A4 Invoice" Style="{StaticResource BlueOrderButton}" FontFamily="{StaticResource PoppinsBold}"
+                            x:Name="btnA4" Click="BtnA4_Click"/>
+                    <Button Content="View Receipt" Style="{StaticResource GreenOrderButton}" FontFamily="{StaticResource PoppinsBold}"
+                            x:Name="btnReceipt" Click="BtnReceipt_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </cc:ModalWindow>
+</Window>

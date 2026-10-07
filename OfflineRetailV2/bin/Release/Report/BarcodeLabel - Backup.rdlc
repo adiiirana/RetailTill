@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2005/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <DataSources>
+    <DataSource Name="BarcodeLabelDataSource">
+      <rd:DataSourceID>a1b2c3d4-e5f6-7890-abcd-ef1234567890</rd:DataSourceID>
+      <ConnectionProperties>
+        <DataProvider>System.Data.DataSet</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+    </DataSource>
+  </DataSources>
+  <InteractiveHeight>11in</InteractiveHeight>
+  <rd:DrawGrid>true</rd:DrawGrid>
+  <InteractiveWidth>8.5in</InteractiveWidth>
+  <rd:SnapToGrid>true</rd:SnapToGrid>
+  <RightMargin>0.1in</RightMargin>
+  <LeftMargin>0.1in</LeftMargin>
+  <PageHeader>
+    <PrintOnFirstPage>true</PrintOnFirstPage>
+    <Height>0in</Height>
+    <PrintOnLastPage>true</PrintOnLastPage>
+  </PageHeader>
+  <BottomMargin>0.1in</BottomMargin>
+  <rd:ReportID>f1e2d3c4-b5a6-7890-1234-567890abcdef</rd:ReportID>
+  <DataSets>
+    <DataSet Name="BarcodeLabelDataSet">
+      <Fields>
+        <Field Name="COMPANY">
+          <DataField>COMPANY</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="SKU">
+          <DataField>SKU</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DESC">
+          <DataField>DESC</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="PRICE">
+          <DataField>PRICE</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>BarcodeLabelDataSource</DataSourceName>
+        <CommandText />
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+      </Query>
+    </DataSet>
+  </DataSets>
+  <Width>4in</Width>
+  <Body>
+    <ReportItems>
+      <Rectangle Name="LabelRectangle">
+        <Top>0in</Top>
+        <Left>0in</Left>
+        <Height>1.5in</Height>
+        <Width>3.8in</Width>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+        <ReportItems>
+          <Textbox Name="txtCompany">
+            <rd:DefaultName>txtCompany</rd:DefaultName>
+            <Top>0.05in</Top>
+            <Left>0.1in</Left>
+            <Height>0.2in</Height>
+            <Width>2.5in</Width>
+            <Style>
+              <TextAlign>Left</TextAlign>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Value>=Fields!COMPANY.Value</Value>
+            <ZIndex>1</ZIndex>
+          </Textbox>
+          <Textbox Name="txtBarcode">
+            <rd:DefaultName>txtBarcode</rd:DefaultName>
+            <Top>0.3in</Top>
+            <Left>0.1in</Left>
+            <Height>0.4in</Height>
+            <Width>2.5in</Width>
+            <Style>
+              <TextAlign>Center</TextAlign>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Value>="*" + Fields!SKU.Value + "*"</Value>
+            <ZIndex>2</ZIndex>
+          </Textbox>
+          <Textbox Name="txtSKU">
+            <rd:DefaultName>txtSKU</rd:DefaultName>
+            <Top>0.75in</Top>
+            <Left>0.1in</Left>
+            <Height>0.2in</Height>
+            <Width>1.3in</Width>
+            <Style>
+              <TextAlign>Left</TextAlign>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Value>=Fields!SKU.Value</Value>
+            <ZIndex>3</ZIndex>
+          </Textbox>
+          <Textbox Name="txtPrice">
+            <rd:DefaultName>txtPrice</rd:DefaultName>
+            <Top>0.75in</Top>
+            <Left>1.5in</Left>
+            <Height>0.2in</Height>
+            <Width>1.1in</Width>
+            <Style>
+              <TextAlign>Right</TextAlign>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Value>=Fields!PRICE.Value</Value>
+            <ZIndex>4</ZIndex>
+          </Textbox>
+          <Textbox Name="txtDescription">
+            <rd:DefaultName>txtDescription</rd:DefaultName>
+            <Top>1in</Top>
+            <Left>0.1in</Left>
+            <Height>0.4in</Height>
+            <Width>2.5in</Width>
+            <Style>
+              <TextAlign>Left</TextAlign>
+              <PaddingLeft>2pt</PaddingLeft>
+              <PaddingRight>2pt</PaddingRight>
+              <PaddingTop>2pt</PaddingTop>
+              <PaddingBottom>2pt</PaddingBottom>
+            </Style>
+            <CanGrow>true</CanGrow>
+            <Value>=Fields!DESC.Value</Value>
+            <ZIndex>5</ZIndex>
+          </Textbox>
+        </ReportItems>
+      </Rectangle>
+    </ReportItems>
+    <Height>1.5in</Height>
+  </Body>
+  <Language>en-US</Language>
+  <PageFooter>
+    <PrintOnFirstPage>true</PrintOnFirstPage>
+    <Height>0in</Height>
+    <PrintOnLastPage>true</PrintOnLastPage>
+  </PageFooter>
+  <TopMargin>0.1in</TopMargin>
+</Report>

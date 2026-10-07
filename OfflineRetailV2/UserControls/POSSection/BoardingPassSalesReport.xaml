@@ -1,0 +1,185 @@
+﻿<Window x:Class="OfflineRetailV2.BoardingPassSalesReport"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+        xmlns:cc="clr-namespace:OfflineRetailV2.Controls"
+        Title="Boarding Pass Sales Report" 
+        AllowsTransparency="True" 
+        WindowStyle="None" 
+        Background="Transparent" 
+        WindowState="Maximized">
+
+    <Window.Resources>
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                              VerticalAlignment="Center" 
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid Background="#3D000000" x:Name="blurGrid" Visibility="Collapsed"/>
+
+        <cc:ModalWindow x:Name="ModalWindow" 
+                        Width="750" 
+                        Height="650" 
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Center">
+
+            <Grid x:Name="MainContentArea" Margin="40">
+                <Grid.Effect>
+                    <BlurEffect x:Name="BackgroundBlur" Radius="0" KernelType="Box"/>
+                </Grid.Effect>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Boarding Pass SALES REPORT" FontSize="24" FontWeight="Light" VerticalAlignment="Center"/>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button x:Name="btnGenerate" Width="110" Height="35" Margin="0,0,10,0" 
+                                Background="#47a929" Foreground="White" BorderThickness="0" 
+                                Style="{StaticResource ModernButtonStyle}"
+                                Cursor="Hand" Click="BtnGenerate_Click">
+                            <TextBlock Text="GENERATE" Foreground="White" FontWeight="SemiBold"/>
+                        </Button>
+
+                        <Button x:Name="btnPrint" Width="90" Height="35" 
+                                Background="#F59E0B" Foreground="White" BorderThickness="0" 
+                                Style="{StaticResource ModernButtonStyle}"
+                                Cursor="Hand" Click="BtnPrint_Click">
+                            <TextBlock Text="PRINT" Foreground="White" FontWeight="SemiBold"/>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="1" Margin="0,0,0,20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="12"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="15"/>
+                        <ColumnDefinition Width="180"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                        <TextBlock Text="Flight Number" Margin="5,0,0,4" Opacity="0.8"/>
+                        <dxe:ComboBoxEdit x:Name="cmbFlightNo" Height="35" NullText="All Flights" IsTextEditable="False" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Margin="5,0,0,0" Grid.Column="2">
+                        <TextBlock Text="Origin" Margin="0,0,0,4" Opacity="0.8"/>
+                        <dxe:ComboBoxEdit IsTextEditable="False" x:Name="cmbFromFlight" Height="35" NullText="Select Origin..." />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="4">
+                        <TextBlock Text="Destination" Margin="0,0,0,4" Opacity="0.8"/>
+                        <dxe:ComboBoxEdit x:Name="cmbToFlight" IsTextEditable="False" Height="35" NullText="Select Destination..." />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="2">
+                        <TextBlock Text="Start Date" Margin="0,0,0,4" Opacity="0.8" />
+                        <dxe:DateEdit x:Name="dtStart" 
+                                      Height="35" 
+                                      Mask="d" MaskUseAsDisplayFormat="True" 
+                                      IsTextEditable="False"
+                                      PreviewMouseLeftButtonDown="DateEdit_PreviewMouseLeftButtonDown" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="4">
+                        <TextBlock Text="End Date" Margin="0,0,0,4" Opacity="0.8" />
+                        <dxe:DateEdit x:Name="dtEnd" 
+                                      Height="35" 
+                                      Mask="d" MaskUseAsDisplayFormat="True" 
+                                      IsTextEditable="False"
+                                      PreviewMouseLeftButtonDown="DateEdit_PreviewMouseLeftButtonDown" />
+                    </StackPanel>
+                </Grid>
+
+                <Border Grid.Row="2" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="4" Padding="1" Margin="0,0,0,15">
+                    <dxg:GridControl x:Name="grdReport" AutoGenerateColumns="AddNew">
+                        <dxg:GridControl.Resources>
+                            <Style TargetType="dxg:GridColumn">
+                                <Setter Property="HorizontalHeaderContentAlignment" Value="Left"/>
+                                <Setter Property="EditSettings">
+                                    <Setter.Value>
+                                        <dxe:TextEditSettings HorizontalContentAlignment="Left"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="HeaderTemplate">
+                                    <Setter.Value>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </dxg:GridControl.Resources>
+
+                        <dxg:GridControl.View>
+                            <dxg:TableView x:Name="viewReport" 
+                                           ShowGroupPanel="False" 
+                                           ShowTotalSummary="True" 
+                                           AutoWidth="True" 
+                                           AllowEditing="False"
+                                           RowMinHeight="40"
+                                           HeaderPanelMinHeight="40"/>
+                        </dxg:GridControl.View>
+
+                        <dxg:GridControl.TotalSummary>
+                            <dxg:GridSummaryItem FieldName="RevenueGenerated" SummaryType="Sum" x:Name="sumRevenue" DisplayFormat="Sum: {0:C2}"/>
+                        </dxg:GridControl.TotalSummary>
+                    </dxg:GridControl>
+                </Border>
+
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <TextBlock Text="Total Revenue:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,10,0" FontSize="14" />
+                        <dxe:TextEdit x:Name="txtTotalRevenue" 
+              Width="160" 
+              Height="35" 
+              IsReadOnly="True" 
+              HorizontalContentAlignment="Right"
+              VerticalContentAlignment="Center"
+              FontSize="16" 
+              FontWeight="Bold"
+              MaskUseAsDisplayFormat="True"/>
+                    </StackPanel>
+                </Grid>
+
+            </Grid>
+        </cc:ModalWindow>
+    </Grid>
+</Window>

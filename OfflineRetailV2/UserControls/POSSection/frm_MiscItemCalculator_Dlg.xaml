@@ -1,0 +1,251 @@
+﻿<Window x:Class="OfflineRetailV2.UserControls.POSSection.frm_MiscItemCalculator_Dlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:OfflineRetailV2.UserControls.POSSection"
+        xmlns:cc="clr-namespace:OfflineRetailV2.Controls"
+        xmlns:lm="clr-namespace:OfflineRetailV2.LayoutManager"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+        AllowsTransparency="True" 
+        WindowStyle="None" 
+        Background="Transparent" 
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Title="" FocusVisualStyle="{x:Null}"
+        Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <Style x:Key="scTextEditStyle" TargetType="dxe:TextEdit">
+                <Setter Property="Height" Value="38"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource scBorderBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource scControlBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource scTextPrimaryBrush}"/>
+                <Setter Property="CornerRadius" Value="6"/>
+                <Setter Property="Padding" Value="10,0,10,0"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="scComboBoxEditStyle" TargetType="dxe:ComboBoxEdit">
+                <Setter Property="Height" Value="38"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource scBorderBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource scControlBackgroundBrush}"/>
+                <Setter Property="Foreground" Value="{DynamicResource scTextPrimaryBrush}"/>
+                <Setter Property="CornerRadius" Value="6"/>
+                <Setter Property="Padding" Value="10,0,10,0"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style>
+
+            <Style x:Key="scPrimaryButtonStyle" TargetType="Button">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="Background" Value="{DynamicResource scPrimaryGreenBrush}"/>
+                <Setter Property="Height" Value="42"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border CornerRadius="6" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <ContentPresenter.Resources>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}"/>
+                                        </Style>
+                                    </ContentPresenter.Resources>
+                                </ContentPresenter>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource scPrimaryGreenHoverBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource scPrimaryGreenPressedBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="scSecondaryButtonStyle" TargetType="Button">
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Foreground" Value="{DynamicResource scTextPrimaryBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource scSecondaryButtonBrush}"/>
+                <Setter Property="Height" Value="42"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border CornerRadius="6" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="scKeypadButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="{DynamicResource scKeypadBackgroundBrush}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource scBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Foreground" Value="{DynamicResource scTextPrimaryBrush}"/>
+                <Setter Property="FontSize" Value="18"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Margin" Value="3"/>
+                <Setter Property="Height" Value="50"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="scInlineQtyBoxStyle" TargetType="Border">
+                <Setter Property="BorderBrush" Value="{DynamicResource scBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius" Value="6"/>
+                <Setter Property="Background" Value="{DynamicResource scControlBackgroundBrush}"/>
+                <Setter Property="Height" Value="42"/>
+            </Style>
+
+            <Style x:Key="scInlineQtyButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Width" Value="40"/>
+                <Setter Property="FontSize" Value="20"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Border Background="#44000000" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Width="500">
+            <Border CornerRadius="15" Margin="20">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="40" ShadowDepth="10" Opacity="0.2" Color="Black"/>
+                </Border.Effect>
+            </Border>
+
+            <cc:ModalWindow x:Name="ModalWindow" Margin="5">
+                <Border Background="{DynamicResource scWindowBackgroundBrush}" CornerRadius="15" Padding="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Grid.Row="0" Margin="0,0,0,15" HorizontalAlignment="Center">
+                            <TextBlock Text="Add Misc" Foreground="{DynamicResource scTextSecondaryBrush}" FontSize="20" FontWeight="Bold" FontFamily="{StaticResource PoppinsBold}" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Enter details for misc" Foreground="{DynamicResource scTextSecondaryBrush}" FontSize="12" Margin="0,2,0,0" HorizontalAlignment="Center"/>
+                        </StackPanel>
+
+                        <Border Grid.Row="1" Background="{DynamicResource scPriceInput}" BorderBrush="{DynamicResource scBorderBrush}" BorderThickness="2" CornerRadius="8" Height="50" Margin="0,0,0,15">
+                            <TextBlock Text="£0.00" x:Name="numPrice" FontSize="28" FontWeight="Bold" Foreground="{DynamicResource scTextSecondaryBrush}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+
+                        <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Stretch">
+                            <Grid Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" Orientation="Vertical" Margin="0,0,10,0">
+                                    <TextBlock Text="Qty" Margin="0,0,0,3" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource scTextSecondaryBrush}" x:Name="lblQty"/>
+                                    <Border Style="{StaticResource scInlineQtyBoxStyle}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Button x:Name="btnQtyMinus" Grid.Column="0" Content="−" Style="{StaticResource scInlineQtyButtonStyle}" Foreground="{DynamicResource scDestructiveBrush}" Click="btnQtyMinus_Click"/>
+                                            <TextBlock x:Name="txtQty" Grid.Column="1" Text="1" Foreground="{DynamicResource scTextSecondaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="16" FontWeight="SemiBold"/>
+                                            <Button x:Name="btnQtyPlus" Grid.Column="2" Content="+" Style="{StaticResource scInlineQtyButtonStyle}" Foreground="{DynamicResource scPrimaryGreenBrush}" Click="btnQtyPlus_Click"/>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" Orientation="Vertical">
+                                    <TextBlock Text="Tax" Margin="0,0,0,3" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource scTextSecondaryBrush}"/>
+                                    <dxe:ComboBoxEdit x:Name="cmbTaxType" 
+                                                      Style="{StaticResource scComboBoxEditStyle}"
+                                                      IsTextEditable="False"
+                                                      Foreground="{DynamicResource scTextSecondaryBrush}"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel Margin="0,0,0,15">
+                                <TextBlock Text="Description" Margin="0,0,0,3" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource scTextSecondaryBrush}"/>
+                                <dxe:TextEdit x:Name="txtProduct"
+                                      Style="{StaticResource scTextEditStyle}"
+                                      HorizontalAlignment="Stretch"
+                                      FontSize="13" 
+                                      FontWeight="SemiBold"
+                                      Foreground="{DynamicResource scTextSecondaryBrush}"
+                                      Height="42"
+              
+                                      NullText="Enter item name..."
+                                      NullTextForeground="#808080"
+                                      ShowNullTextIfFocused="True"
+              
+                                      GotFocus="Full_GotFocus"
+                                      MouseRightButtonDown="txtProduct_MouseRightButtonDown"
+                                      MouseLeftButtonDown="txtProduct_MouseLeftButtonDown"/>
+                            </StackPanel>
+
+                            <UniformGrid Columns="3" Rows="4" Margin="0,0,0,15">
+                                <Button Content="7" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Content="8" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Content="9" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Content="4" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Content="5" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Content="6" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Content="1" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Content="2" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Content="3" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Content="Clear" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_ClearBtnClick" Foreground="{DynamicResource scDestructiveBrush}" FontSize="16"/>
+                                <Button Content="0" Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_NumClick"/>
+                                <Button Style="{StaticResource scKeypadButtonStyle}" Click="Keypad_BackspaceClick">
+                                    <TextBlock Text="⌫" FontSize="20" FontWeight="Bold"/>
+                                </Button>
+                            </UniformGrid>
+                        </StackPanel>
+
+                        <Grid Grid.Row="3" Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button Content="DONE" x:Name="btnOK" Style="{StaticResource scPrimaryButtonStyle}" Grid.Column="0" Foreground="White" Margin="0,0,10,0" Click="btnOK_Click"/>
+                            <Button Content="CANCEL" x:Name="btnCancel" Style="{StaticResource scSecondaryButtonStyle}" Grid.Column="1" Width="120" Click="btnCancel_Click"/>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </cc:ModalWindow>
+        </Grid>
+    </Grid>
+</Window>

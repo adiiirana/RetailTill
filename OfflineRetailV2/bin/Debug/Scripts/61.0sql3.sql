@@ -1,0 +1,697 @@
+create procedure [dbo].[sp_CloseoutReportTender_HostSync]
+			@CloseoutType	char(1),
+			@CloseoutID	int
+			
+as
+  
+declare @TID 			int;
+declare @TTName			nvarchar(40);
+declare @TName			nvarchar(40);
+declare @Count 			int;
+declare @Amount 			numeric(18,3);
+declare @TAmount			numeric(18,3);
+declare @cashbackamt		numeric(18,3);
+declare @cashbackcnt		int;
+declare @cardprocessingamt		numeric(18,3);
+declare @cardprocessingcnt		int;
+declare	@LocalCloseoutType	char(1);
+declare	@LocalCloseoutID		int;
+
+
+declare @cashfloatamt			numeric(18,3);
+declare @boolCashTenderingExists char(1);
+declare @CashTenderID int;
+
+declare @ConsolidatedTerminal	int;
+
+declare @safedropamt		numeric(18,3);
+declare @paidinamt			numeric(18,3);
+declare @paidoutamt			numeric(18,3);
+declare @cashoutamt			numeric(18,3);
+declare @cashinamt			numeric(18,3);
+
+declare @conf			char(1);
+
+begin
+   set @conf = 'N';
+   set @LocalCloseoutType = @CloseoutType;
+   set @LocalCloseoutID	= @CloseoutID;
+   
+
+   set @cashbackamt = 0;
+   set @cashbackcnt = 0;
+
+   set @cardprocessingamt = 0;
+   set @cardprocessingcnt = 0;
+   set @cashfloatamt = 0;
+
+   set @boolCashTenderingExists = 'N';
+   set @CashTenderID = 0;
+   set @ConsolidatedTerminal = 0;
+
+   set @cashoutamt = 0;
+
+
+   set @Count = 0;
+   
+  
+  if @LocalCloseoutType = 'E' or @LocalCloseoutType = 'T' begin
+   
+    declare sc10 cursor
+    for select ID, DisplayAs,Name from TenderTypes where name <> 'Store Credit' order by PaymentOrder
+               
+    open sc10
+    fetch next from sc10 into @TID,@TName,@TTName
+    while @@fetch_status = 0 begin
+
+     select @Count = count(*) , @Amount = isnull(sum(t.tenderamount),0) from tender t left outer join trans tr
+     on tr.ID = t.TransactionNo 
+     where t.TenderType = @TID and tr.CloseoutID = @LocalCloseoutID and tr.TransType not in (6,66,67,91,92)
+     and tr.ID not in ( select transactionno from invoice where id in ( select invoiceno from VoidInv 
+     where invoiceno not in ( select id from invoice where repairparentid = 0 and servicetype = 'Repair' )))
+	 and tr.ID not in (select transactionno from invoice where id in (select invoiceno from VoidInv))
+	 and tr.ID not in (select transactionno from invoice where RepairParentID in (select invoiceno from VoidInv))
+
+	 if @LocalCloseoutType = 'T' and @TTName = 'Cash' and @Count = 0 begin
+	   set @CashTenderID = @TID;
+	   set @boolCashTenderingExists = 'N';
+	   
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,@TName,-929292,@Count,@CloseoutType);
+
+	   select @cashfloatamt  = isnull(cashfloat,0) from CashFloat where CloseoutID = @CloseoutID;
+			    
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash Float',@cashfloatamt,0,@CloseoutType);
+
+       select @cashinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 91 and CloseoutID = @CloseoutID);
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash In',@cashinamt,0,@CloseoutType);
+
+				select @cashoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 92 and CloseoutID = @CloseoutID);
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash Out',@cashoutamt,0,@CloseoutType);
+	  
+	   select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID = @CloseoutID) and TenderType = @TID;
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid In',@paidinamt,0,@CloseoutType);
+
+				select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID = @CloseoutID) and TenderType = @TID;
+					
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid Out',@paidoutamt,0,@CloseoutType);
+
+	   select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID = @CloseoutID) and TenderType = @TID;
+	   
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Safe Drop',@safedropamt,0,@CloseoutType);
+	 end
+
+	 if @LocalCloseoutType = 'T' and (@TTName = 'Check' or @TTName = 'Credit Card' or @TTName = 'Debit Card' 
+	 or @TTName = 'Card'  or @TTName = 'Food Stamps' or @TTName = 'EBT' or @TTName = 'EBT Cash' 
+	 or @TTName = 'EBT Voucher' or @TTName = 'Visa' or @TTName = 'MasterCard' or @TTName = 'American Express' 
+				 or @TTName = 'Discover' or @TTName = 'Diner') and @Count = 0 begin
+
+	   select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID = @CloseoutID) and TenderType = @TID;
+	   select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID = @CloseoutID) and TenderType = @TID;
+	   select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID = @CloseoutID) and TenderType = @TID;
+
+	   if @paidinamt <> 0 or @paidoutamt <> 0 or @safedropamt <> 0 begin
+
+			
+
+			if @paidinamt <> 0 begin
+			 
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid In',@paidinamt,0,@CloseoutType);
+
+			end
+
+			if @paidoutamt <> 0 begin
+			 
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid Out',@paidoutamt,0,@CloseoutType);
+
+			end
+
+			if @safedropamt <> 0 begin
+			 
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Safe Drop',@safedropamt,0,@CloseoutType);
+
+			end
+
+	   end
+	  
+
+				 
+
+				
+	 end
+
+     if @Count > 0 begin
+	    if @TTName = 'Credit Card' or @TTName = 'Debit Card' or @TTName = 'EBT' or @TTName = 'EBT Cash' begin
+		  set @cardprocessingcnt = @cardprocessingcnt + @Count;
+		  set @cardprocessingamt = @cardprocessingamt + @Amount;
+		end
+		     if @LocalCloseoutType = 'T' begin
+			   if @TTName = 'Cash' begin
+			        set @CashTenderID = @TID;
+					set @boolCashTenderingExists = 'Y';
+			        
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,@TName,-929292,@Count,@CloseoutType);
+
+					select @cashfloatamt  = isnull(cashfloat,0) from CashFloat where CloseoutID = @CloseoutID;
+			    
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash Float',@cashfloatamt,0,@CloseoutType);
+
+				select @cashinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 91 and CloseoutID = @CloseoutID);
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash In',@cashinamt,0,@CloseoutType);
+
+				select @cashoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 92 and CloseoutID = @CloseoutID);
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash Out',@cashoutamt,0,@CloseoutType);
+
+				select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID = @CloseoutID) and TenderType = @TID;
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid In',@paidinamt,0,@CloseoutType);
+
+				select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID = @CloseoutID) and TenderType = @TID;
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid Out',@paidoutamt,0,@CloseoutType);
+
+				select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID = @CloseoutID) and TenderType = @TID;
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Safe Drop',@safedropamt,0,@CloseoutType);
+
+				
+				   insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,'   Tender' + '  (' + cast(@Count as varchar(5)) + ')',@Amount,@Count,@CloseoutType);
+
+			   end
+			   else if (@TTName = 'Check' or @TTName = 'Credit Card' or @TTName = 'Debit Card' 
+				 or @TTName = 'Card'  or @TTName = 'Food Stamps' or @TTName = 'EBT' or @TTName = 'EBT Cash' 
+				 or @TTName = 'EBT Voucher' or @TTName = 'Visa' or @TTName = 'MasterCard' or @TTName = 'American Express' 
+				 or @TTName = 'Discover' or @TTName = 'Diner') begin
+
+					select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID = @CloseoutID) and TenderType = @TID;
+					select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID = @CloseoutID) and TenderType = @TID;
+					select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID = @CloseoutID) and TenderType = @TID;
+
+					
+
+					if @paidinamt <> 0 or @paidoutamt <> 0 or @safedropamt <> 0 begin
+
+			
+
+			if @paidinamt <> 0 begin
+			 
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid In',@paidinamt,0,@CloseoutType);
+
+			end
+
+			if @paidoutamt <> 0 begin
+			  
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid Out',@paidoutamt,0,@CloseoutType);
+
+			end
+
+			if @safedropamt <> 0 begin
+			  
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Safe Drop',@safedropamt,0,@CloseoutType);
+
+			end
+
+	   end
+	  
+					
+				  insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,'   Tender' + + '  (' + cast(@Count as varchar(5)) + ')',@Amount,@Count,@CloseoutType);
+
+				 
+
+				
+				end
+			   else begin
+			    
+				  insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,@TName + '  (' + cast(@Count as varchar(5)) + ')',@Amount,@Count,@CloseoutType);
+
+			   end
+			end
+			else begin
+			 
+				insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,@TName + '  (' + cast(@Count as varchar(5)) + ')',@Amount,@Count,@CloseoutType);
+			end
+            
+      end
+      set @Count = 0;
+     fetch next from sc10 into @TID,@TName,@TTName
+
+    end
+
+    close sc10
+    deallocate sc10
+
+	
+
+	
+	select @cashbackcnt = count(*) from CardTrans where CardType = 'Debit Card' and TransactionType = 'Sale'
+	and TransactionNo > 0 and RefCardAuthAmount - CardAmount > 0 and TransactionNo in ( select id from Trans where CloseOutID  = @LocalCloseoutID);
+
+	select @cashbackamt = isnull(sum(RefCardAuthAmount - CardAmount),0) from CardTrans where CardType = 'Debit Card' and TransactionType = 'Sale'
+	and TransactionNo > 0 and TransactionNo in ( select id from Trans where CloseOutID  = @LocalCloseoutID);
+    
+	if (@cashbackcnt > 0)
+	begin
+	  
+	  insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,TenderCount,CloseoutType)
+                       values('T',@LocalCloseoutID,'Debit Card Cash Back',@cashbackamt,@cashbackcnt,@CloseoutType)
+
+	end
+	/*
+	select @cardprocessingcnt = count(*) from CardTrans where CardType in ('Credit Card','Debit Card','EBT','EBT Cash') and TransactionType = 'Sale'
+	and TransactionNo > 0 and TransactionNo in ( select id from Trans where CloseOutID  = @CloseoutID);
+
+	select @cardprocessingamt = isnull(sum(CardAmount),0) from CardTrans where CardType in ('Credit Card','Debit Card','EBT','EBT Cash') and TransactionType = 'Sale'
+	and TransactionNo > 0 and TransactionNo in ( select id from Trans where CloseOutID  = @CloseoutID);*/
+    
+	if (@cardprocessingcnt > 0)
+	begin
+	  
+		insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,TenderCount,CloseoutType)
+                       values('T',@LocalCloseoutID,'Card Processing Total',@cardprocessingamt,@cardprocessingcnt,@CloseoutType)
+	end
+
+    
+    declare sc11 cursor
+
+    for select c.TenderID,c.TenderAmount,t.DisplayAs,t.Name from CloseoutTender c left outer join tendertypes t on t.ID = c.TenderID 
+    where c.CloseoutID=@LocalCloseoutID and t.name <> 'Store Credit' order by t.PaymentOrder
+               
+    open sc11
+    fetch next from sc11 into @TID,@TAmount,@TName,@TTName
+    while @@fetch_status = 0 begin
+
+     
+							 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,CloseoutType)
+                            values('C',@LocalCloseoutID,@TName,@TAmount,@CloseoutType)
+
+     set @Count = 0;
+     select @Amount = TenderAmount,@Count = TenderCount from CentralExportCloseoutReportTender where RecordType = 'T' and TenderName = @TName and 
+     CloseoutID=@LocalCloseoutID
+
+	 if @LocalCloseoutType = 'T' and (@TTName = 'Cash' or @TTName = 'Check' or @TTName = 'Credit Card' or @TTName = 'Debit Card' 
+				 or @TTName = 'Card'  or @TTName = 'Food Stamps' or @TTName = 'EBT' or @TTName = 'EBT Cash' 
+				 or @TTName = 'EBT Voucher' or @TTName = 'Visa' or @TTName = 'MasterCard' or @TTName = 'American Express' 
+				 or @TTName = 'Discover' or @TTName = 'Diner')  begin
+	   select @Amount = sum(TenderAmount),@Count = sum(TenderCount) from CentralExportCloseoutReportTender where RecordType = 'T' and TenderName = @TName and 
+       CloseoutID=@LocalCloseoutID  and TenderAmount != -929292 and TenderName not in ('  Cash Float', '  Cash In', '  Cash Out', '  Paid In', '  Paid Out')
+	 end
+     
+     if @Count > 0 begin
+     
+					  insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,CloseoutType)
+                            values('R',@LocalCloseoutID,@TName,@TAmount-@Amount,@CloseoutType)
+     end
+     fetch next from sc11 into @TID,@TAmount,@TName,@TTName
+
+    end
+    close sc11
+    deallocate sc11
+
+  end
+
+  
+   
+  if @LocalCloseoutType = 'C' begin
+   
+    select @ConsolidatedTerminal = count(*) from CloseOut where CloseoutType = 'T' and ConsolidatedID = @CloseoutID;
+	if @ConsolidatedTerminal = 0 begin
+	   select @ConsolidatedTerminal = count(*) from CloseOut where CloseoutType = 'C' and ConsolidatedID = @CloseoutID;
+	   set @conf = 'Y';
+	end
+    declare csc10 cursor
+    for select ID, DisplayAs,Name from TenderTypes where name <> 'Store Credit' order by PaymentOrder
+               
+    open csc10
+    fetch next from csc10 into @TID,@TName,@TTName
+    while @@fetch_status = 0 begin
+
+     select @Count = count(*) , @Amount = isnull(sum(t.tenderamount),0) from tender t left outer join trans tr
+     on tr.ID = t.TransactionNo 
+     where t.TenderType = @TID and tr.CloseoutID in 
+     (select c.ID from closeout c where c.consolidatedID = @LocalCloseoutID) and tr.TransType not in (66,67,6,91,92)
+     and tr.ID not in ( select transactionno from invoice where id in ( select invoiceno from VoidInv 
+     where invoiceno not in ( select id from invoice where repairparentid = 0 and servicetype = 'Repair' )))
+	 and tr.ID not in (select transactionno from invoice where id in (select invoiceno from VoidInv))
+	 and tr.ID not in (select transactionno from invoice where RepairParentID in (select invoiceno from VoidInv))
+
+	  if @ConsolidatedTerminal > 0 and @TTName = 'Cash' and @Count = 0 begin
+	   set @CashTenderID = @TID;
+	   set @boolCashTenderingExists = 'N';
+	  
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,@TName,-929292,@Count,@CloseoutType);
+
+	   if (@conf = 'N') select @cashfloatamt  = isnull(sum(cashfloat),0) from CashFloat where CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T');
+	   if (@conf = 'Y') select @cashfloatamt  = isnull(sum(cashfloat),0) from CashFloat where CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID );
+			   
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash Float',@cashfloatamt,0,@CloseoutType);
+
+	  if (@conf = 'N') select @cashinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 91 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T'));
+	  if (@conf = 'Y') select @cashinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 91 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID));
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash In',@cashinamt,0,@CloseoutType);
+
+	  if (@conf = 'N') select @cashoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 92 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T'));
+	   if (@conf = 'Y') select @cashoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 92 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID ));
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash Out',@cashoutamt,0,@CloseoutType);
+
+	   if (@conf = 'N') select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;
+
+if (@conf = 'Y') select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID)) and TenderType = @TID;
+
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid In',@paidinamt,0,@CloseoutType);
+
+	  if (@conf = 'N') select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;
+	  if (@conf = 'Y') select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID)) and TenderType = @TID;
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid Out',@paidoutamt,0,@CloseoutType);
+
+	   if (@conf = 'N') select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;
+
+if (@conf = 'Y') select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID )) and TenderType = @TID;
+
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Safe Drop',@safedropamt,0,@CloseoutType);
+	 end
+
+
+	  if @ConsolidatedTerminal > 0 and (@TTName = 'Check' or @TTName = 'Credit Card' or @TTName = 'Debit Card' 
+	  or @TTName = 'Card'  or @TTName = 'Food Stamps' or @TTName = 'EBT' or @TTName = 'EBT Cash' 
+	  or @TTName = 'EBT Voucher' or @TTName = 'Visa' or @TTName = 'MasterCard' or @TTName = 'American Express' 
+				 or @TTName = 'Discover' or @TTName = 'Diner') and @Count = 0 begin
+	    
+		if (@conf = 'N') begin
+		select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;
+		select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;
+		select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;
+		end
+
+if (@conf = 'Y') begin
+		select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID )) and TenderType = @TID;
+		select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID )) and TenderType = @TID;
+		select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID )) and TenderType = @TID;
+		end
+
+
+		if @paidinamt <> 0 or @paidoutamt <> 0 or @safedropamt <> 0 begin
+		   
+		   
+
+		   if @paidinamt <> 0 begin
+			  
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid In',@paidinamt,0,@CloseoutType);
+
+			end
+
+			if @paidoutamt <> 0 begin
+			 
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid Out',@paidoutamt,0,@CloseoutType);
+
+			end
+
+			if @safedropamt <> 0 begin
+			  
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Safe Drop',@safedropamt,0,@CloseoutType);
+
+			end
+
+
+		end
+	  end
+
+
+     if @Count > 0 begin
+	         if @TTName = 'Credit Card' or @TTName = 'Debit Card' or @TTName = 'EBT' or @TTName = 'EBT Cash' begin
+				set @cardprocessingcnt = @cardprocessingcnt + @Count;
+				set @cardprocessingamt = @cardprocessingamt + @Amount;
+		end
+
+		if @ConsolidatedTerminal > 0 begin
+		  
+		   if @TTName = 'Cash' begin
+			        set @CashTenderID = @TID;
+					set @boolCashTenderingExists = 'Y';
+			        
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,@TName,-929292,@Count,@CloseoutType);
+
+					if (@conf = 'N') select @cashfloatamt  = isnull(sum(cashfloat),0) from CashFloat where CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T');
+
+if (@conf = 'Y') select @cashfloatamt  = isnull(sum(cashfloat),0) from CashFloat where CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID );
+
+			        
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			        TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash Float',@cashfloatamt,0,@CloseoutType);
+
+					if (@conf = 'N') select @cashinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 91 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T'));
+
+if (@conf = 'Y') select @cashinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 91 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID));
+
+
+					insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash In',@cashinamt,0,@CloseoutType);
+
+					if (@conf = 'N') select @cashoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 92 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T'));
+
+if (@conf = 'Y') select @cashoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 92 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID));
+
+
+					
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Cash Out',@cashoutamt,0,@CloseoutType);
+
+					if (@conf = 'N') select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;;
+
+if (@conf = 'Y') select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID )) and TenderType = @TID;;
+
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid In',@paidinamt,0,@CloseoutType);
+
+	  if (@conf = 'N') select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;;
+
+if (@conf = 'Y') select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID)) and TenderType = @TID;;
+
+
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid Out',@paidoutamt,0,@CloseoutType);
+
+					if (@conf = 'N') select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;;
+
+if (@conf = 'Y') select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID)) and TenderType = @TID;;
+
+					
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Safe Drop',@safedropamt,0,@CloseoutType);
+
+				
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,'   Tender' + '  (' + cast(@Count as varchar(5)) + ')',@Amount,@Count,@CloseoutType);
+			   
+			   end
+
+			   else if (@TTName = 'Check' or @TTName = 'Credit Card' or @TTName = 'Debit Card' 
+				 or @TTName = 'Card'  or @TTName = 'Food Stamps' or @TTName = 'EBT' or @TTName = 'EBT Cash' 
+				 or @TTName = 'EBT Voucher' or @TTName = 'Visa' or @TTName = 'MasterCard' or @TTName = 'American Express' 
+				 or @TTName = 'Discover' or @TTName = 'Diner') begin
+
+				
+					if (@conf = 'N') begin
+						select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;
+						select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;
+						select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID and CloseoutType = 'T')) and TenderType = @TID;
+					end
+
+if (@conf = 'Y') begin
+						select @paidinamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 66 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID)) and TenderType = @TID;
+						select @paidoutamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 6 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID )) and TenderType = @TID;
+						select @safedropamt = isnull(sum(TenderAmount),0) from Tender where TransactionNo in (select id from Trans where TransType = 67 and CloseoutID in (Select ID from CloseOut where ConsolidatedID = @CloseoutID )) and TenderType = @TID;
+					end
+
+		if @paidinamt <> 0 or @paidoutamt <> 0 or @safedropamt <> 0 begin
+		   
+		   
+
+		   if @paidinamt <> 0 begin
+			 
+
+			  
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid In',@paidinamt,0,@CloseoutType);
+
+			end
+
+			if @paidoutamt <> 0 begin
+			  
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Paid Out',@paidoutamt,0,@CloseoutType);
+
+			end
+
+			if @safedropamt <> 0 begin
+			  
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+			    TenderCount,CloseoutType)values('T',@LocalCloseoutID,'  Safe Drop',@safedropamt,0,@CloseoutType);
+
+			end
+
+
+		end
+
+				
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,'   Tender' + + '  (' + cast(@Count as varchar(5)) + ')',@Amount,@Count,@CloseoutType);
+
+			   end
+
+			   else begin
+
+			    
+					 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,
+					TenderCount,CloseoutType)values('T',@LocalCloseoutID,@TName + '  (' + cast(@Count as varchar(5)) + ')',@Amount,@Count,@CloseoutType);
+			   end
+
+
+		end
+		else begin
+		 
+				 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,TenderCount,CloseoutType)
+                       values('T',@LocalCloseoutID,@TName + '  (' + cast(@Count as varchar(5)) + ')',@Amount,@Count,@CloseoutType);
+
+		end
+
+			
+     end
+     set @Count = 0;
+     
+     fetch next from csc10 into @TID,@TName,@TTName
+
+    end
+
+    close csc10
+    deallocate csc10
+
+
+	
+
+
+	select @cashbackcnt = count(*) from CardTrans where CardType = 'Debit Card' and TransactionType = 'Sale'
+	and TransactionNo > 0 and RefCardAuthAmount - CardAmount > 0 and TransactionNo in ( select id from Trans where CloseOutID 
+               in (select cls.ID from closeout cls where cls.consolidatedID = @LocalCloseoutID) );
+
+	select @cashbackamt = isnull(sum(RefCardAuthAmount - CardAmount),0) from CardTrans where CardType = 'Debit Card' and TransactionType = 'Sale'
+	and TransactionNo > 0 and TransactionNo in ( select id from Trans where CloseOutID 
+               in (select cls.ID from closeout cls where cls.consolidatedID = @LocalCloseoutID) );
+    
+	if (@cashbackcnt > 0)
+	begin
+	  
+						insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,TenderCount,CloseoutType)
+                       values('T',@LocalCloseoutID,'Debit Card Cash Back',@cashbackamt,@cashbackcnt,@CloseoutType)
+
+	end
+
+	/*
+	select @cardprocessingcnt = count(*) from CardTrans where CardType in ('Credit Card','Debit Card','EBT','EBT Cash') and TransactionType = 'Sale'
+	and TransactionNo > 0 and TransactionNo in ( select id from Trans where CloseOutID 
+               in (select cls.ID from closeout cls where cls.consolidatedID = @CloseoutID) );
+
+	select @cardprocessingamt = isnull(sum(CardAmount),0) from CardTrans where CardType in ('Credit Card','Debit Card','EBT','EBT Cash') and TransactionType = 'Sale'
+	and TransactionNo > 0 and TransactionNo in ( select id from Trans where CloseOutID 
+               in (select cls.ID from closeout cls where cls.consolidatedID = @CloseoutID) );*/
+	if (@cardprocessingcnt > 0)
+	begin
+	 
+						insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,TenderCount,CloseoutType)
+                       values('T',@LocalCloseoutID,'Card Processing Total',@cardprocessingamt,@cardprocessingcnt,@CloseoutType)
+	end
+
+    declare csc11 cursor
+
+    for select c.TenderID,c.TenderAmount,t.DisplayAs,t.Name  from CloseoutTender c left outer join tendertypes t
+    on t.ID = c.TenderID where c.CloseoutID=@LocalCloseoutID and t.name <> 'Store Credit' order by t.PaymentOrder
+               
+    open csc11
+    fetch next from csc11 into @TID,@TAmount,@TName,@TTName
+    while @@fetch_status = 0 begin
+
+      
+							 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,CloseoutType)
+                            values('C',@LocalCloseoutID,@TName,@TAmount,@CloseoutType)
+
+      set @Count = 0;
+      
+      select @Amount = TenderAmount,@Count=TenderCount from CentralExportCloseoutReportTender where RecordType = 'T' and TenderName = @TName and 
+      CloseoutID in (select c.ID from closeout c where c.consolidatedID = @LocalCloseoutID) 
+
+      
+	 --@TID = @CashTenderID
+	   if @ConsolidatedTerminal > 0 and (@TTName = 'Cash' or @TTName = 'Check' or @TTName = 'Credit Card' or @TTName = 'Debit Card' 
+				 or @TTName = 'Card'  or @TTName = 'Food Stamps' or @TTName = 'EBT' or @TTName = 'EBT Cash' 
+				 or @TTName = 'EBT Voucher' or @TTName = 'Visa' or @TTName = 'MasterCard' or @TTName = 'American Express' 
+				 or @TTName = 'Discover' or @TTName = 'Diner')  begin
+	   
+	   	   select @Amount = sum(TenderAmount),@Count = sum(TenderCount) from CentralExportCloseoutReportTender where RecordType = 'T' and TenderName = @TName and 
+       CloseoutID=@LocalCloseoutID and TenderAmount != -929292 and TenderName not in ('  Cash Float', '  Cash In', '  Cash Out', '  Paid In', '  Paid Out')
+	 end
+
+     if @Count > 0 begin
+      
+						 insert into CentralExportCloseoutReportTender(RecordType,CloseOutID,TenderName,TenderAmount,CloseoutType)
+                            values('R',@LocalCloseoutID,@TName,@TAmount-@Amount,@CloseoutType)
+
+	end
+          
+      set @Count = 0;    
+      fetch next from csc11 into @TID,@TAmount,@TName,@TTName
+
+    end
+    close csc11
+    deallocate csc11
+
+  end
+
+
+end
+
+GO

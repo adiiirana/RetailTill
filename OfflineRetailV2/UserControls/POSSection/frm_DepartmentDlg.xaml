@@ -1,0 +1,211 @@
+﻿<Window x:Class="OfflineRetailV2.UserControls.POSSection.frm_DepartmentDlg"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:OfflineRetailV2.UserControls.POSSection"
+        xmlns:cc="clr-namespace:OfflineRetailV2.Controls"
+        xmlns:lm="clr-namespace:OfflineRetailV2.LayoutManager"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+        xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" 
+        AllowsTransparency="True" WindowStyle="None" Background="Transparent" WindowStartupLocation="CenterScreen"
+        Title=""   Width="600" Height="580" Closing="Window_Closing" Loaded="Window_Loaded" 
+        >
+    <cc:ModalWindow  x:Name="ModalWindow">
+        <Grid Margin="9">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="9"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Edit Department"  x:Name="Title" VerticalAlignment="Center" Style="{DynamicResource BlueHeading}" />
+                <Grid Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,20,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                        <ColumnDefinition Width="9"></ColumnDefinition>
+                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Content="CANCEL" Height="35" Width="120" FontFamily="{StaticResource OSSemiBold}" 
+                        Style="{DynamicResource CancelButtonStyle}" x:Name="btnCancel" Click="Button_Click" />
+                    <Button Grid.Column="2" Content="SAVE" Height="35" Width="120" FontFamily="{StaticResource OSSemiBold}" 
+                        Style="{DynamicResource SaveButtonStyle}" x:Name="btnLogin" Click="Button_Click_1"/>
+                </Grid>
+            </Grid>
+
+            <Rectangle Grid.Row="1" Style="{DynamicResource DefaultLineStyle}"  VerticalAlignment="Center"  Margin="-9,0"/>
+
+            <Grid Grid.Row="2" Margin="0,9,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="3"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="9"/>
+
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="3"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="9"/>
+
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="3"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="12"/>
+
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="9"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="9"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" Text="Department ID" FontWeight="SemiBold"/>
+                <dxe:TextEdit Grid.Row="2" x:Name="txtID" MaxLength="20" EditValueChanged="TxtID_EditValueChanged" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
+
+                <TextBlock Grid.Row="4" Text="Department Name" FontWeight="SemiBold"/>
+                <dxe:TextEdit Grid.Row="6" x:Name="txtDescription" MaxLength="30" EditValueChanged="TxtID_EditValueChanged" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
+
+                <TextBlock Grid.Row="8" Text="Tax" FontWeight="SemiBold"/>
+                <dxe:ComboBoxEdit Grid.Row="10" x:Name="cmbVAT" IsTextEditable="False" SelectedIndex="0" EditValueChanged="TxtID_EditValueChanged">
+                    <dxe:ComboBoxEditItem Content="None"/>
+                </dxe:ComboBoxEdit>
+
+                <Grid Grid.Row="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <dxe:CheckEdit Grid.Column="0" x:Name="chkDepartmentSale" 
+                                   Content="Department Sale" 
+                                   VerticalAlignment="Center" 
+                                   HorizontalAlignment="Left" 
+                                   Margin="5,0" 
+                                   Width="150" 
+                                   Height="30">
+                        <dxe:CheckEdit.Style>
+                            <Style TargetType="dxe:CheckEdit">
+                                <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="Height" Value="28"/>
+                                <Setter Property="Width" Value="150"/>
+                            </Style>
+                        </dxe:CheckEdit.Style>
+                    </dxe:CheckEdit>
+
+                    <Grid Grid.Column="1" Margin="20,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="21"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="9"/>
+                            <ColumnDefinition/>
+                            <ColumnDefinition Width="21"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="0" Content=" Scale ?" x:Name="chkScale" Click="TxtID_EditValueChanged" Visibility="Collapsed"/>
+                        <TextBlock x:Name="lbDisplayOrder" Grid.Column="2" Text="Scale Display Order" Visibility="Collapsed"/>
+                        <dxe:TextEdit  Grid.Column="4" Width="50" Text="0" x:Name="txtDisplayOrder" Visibility="Collapsed" />
+                        <CheckBox Grid.Column="6" Content=" Add to Scale Screen" x:Name="chkAddToScale" Visibility="Collapsed"/>
+                    </Grid>
+                </Grid>
+
+                <!-- PHOTO SECTION -->
+                <Border Grid.Row="14" Style="{DynamicResource PurpleBorder}">
+                    <TextBlock Style="{DynamicResource PurpleBorderInfo}" FontSize="13" Text="Photo"/>
+                </Border>
+
+                <Grid Grid.Row="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Height="128" Width="140" Style="{DynamicResource GroupBorder}" BorderThickness="1">
+                        <Image x:Name="pictPhoto" Stretch="Uniform"/>
+                    </Border>
+
+                    <Grid Grid.Column="2" Width="120" VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="9"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="9"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Button Grid.Row="0" Width="120" Style="{DynamicResource DeletePhotoButton}" x:Name="btnClearImage"
+                                Click="BtnClearImage_Click"/>
+
+                        <Button Grid.Row="2" Width="120" Style="{DynamicResource ScanPhotoButton}" x:Name="btnScanImage"/>
+
+                        <Button Grid.Row="4" Width="120" MinHeight="30" Style="{DynamicResource SelectPhotoButton}" x:Name="button1"
+                                Click="Button1_Click"/>
+                    </Grid>
+                </Grid>
+
+                <dxe:CheckEdit Grid.Row="18" x:Name="chkOnlyPhotoFullSize"
+                               Content="Show Only Photo"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Left"
+                               Margin="5,0"
+                               Width="250"
+                               Height="30"
+                               EditValueChanged="TxtID_EditValueChanged">
+                    <dxe:CheckEdit.Style>
+                        <Style TargetType="dxe:CheckEdit">
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="FontSize" Value="12"/>
+                            <Setter Property="Height" Value="28"/>
+                            <Setter Property="Width" Value="250"/>
+                        </Style>
+                    </dxe:CheckEdit.Style>
+                </dxe:CheckEdit>
+
+                <Grid Grid.Row="20" Margin="0,9,0,0" x:Name="pGL">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="3"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="9"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="3"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="9"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="3"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="9"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="3"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Sales G/L Account" />
+                    <dxe:ComboBoxEdit Grid.Row="2" x:Name="cmbGL1" IsTextEditable="False" ItemsSource="{Binding}"  NullText="[Select G/L Account]" EditValueChanged="TxtID_EditValueChanged" PreviewMouseLeftButtonDown="CmbGL1_PreviewMouseLeftButtonDown" />
+
+                    <TextBlock Grid.Row="4" Text="Cost G/L Account" />
+                    <dxe:ComboBoxEdit Grid.Row="6" x:Name="cmbGL2" IsTextEditable="False" ItemsSource="{Binding}"  NullText="[Select G/L Account]" EditValueChanged="TxtID_EditValueChanged" PreviewMouseLeftButtonDown="CmbGL1_PreviewMouseLeftButtonDown"/>
+
+                    <TextBlock Grid.Row="8" Text="Payable G/L Account" />
+                    <dxe:ComboBoxEdit Grid.Row="10" x:Name="cmbGL3" IsTextEditable="False" ItemsSource="{Binding}"  NullText="[Select G/L Account]" EditValueChanged="TxtID_EditValueChanged" PreviewMouseLeftButtonDown="CmbGL1_PreviewMouseLeftButtonDown"/>
+
+                    <TextBlock Grid.Row="12" Text="Inventory G/L Account" />
+                    <dxe:ComboBoxEdit Grid.Row="14" x:Name="cmbGL4" IsTextEditable="False" ItemsSource="{Binding}"  NullText="[Select G/L Account]" EditValueChanged="TxtID_EditValueChanged" PreviewMouseLeftButtonDown="CmbGL1_PreviewMouseLeftButtonDown"/>
+                </Grid>
+            </Grid>
+        </Grid>
+    </cc:ModalWindow>
+</Window>

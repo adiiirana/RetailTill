@@ -1,0 +1,14 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/SuperSalonProject/CopilotIndices/17.14.1713.63837
+/docs
+/.vs/SuperSalonProject/FileContentIndex
+/OfflineRetailV2/obj
+/OfflineRetailV2/scripts
+/packages
+/Scripts/Scripts
+/Tables_Used_When_Adding_Master_Data.docx
+/Tables_Used_When_Adding_Master_Data_REVISED.docx
+/Tables_Used_When_Making_Sale.docx

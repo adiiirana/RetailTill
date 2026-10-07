@@ -1,0 +1,78 @@
+﻿<Window x:Class="OfflineRetailV2.UserControls.POSSection.frmPOSShowBalanceDlg2"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:OfflineRetailV2.UserControls.POSSection"
+        xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+        WindowStyle="None" 
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent" 
+        WindowStartupLocation="CenterScreen"
+        Title="frm_ChangePopup" Height="290" Width="566" Loaded="Window_Loaded">
+    <Grid>
+        <Border Background="White" CornerRadius="10" >
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <!-- Print Controls (Toggle switch left, Print button right) -->
+                <Grid Grid.Row="0" Margin="0,0,10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Toggle switch (left-aligned) -->
+                    <dxe:ToggleSwitch Grid.Column="0" 
+                  ContentPlacement="Far" 
+                  HorizontalAlignment="Left" 
+                  VerticalAlignment="Center"
+                  Margin="10,0,10,0"
+                  CheckedStateContent="Print On" 
+                  UncheckedStateContent="Print Off" 
+                  x:Name="tsPrint"
+                  FontSize="10" 
+                  FontWeight="Bold"
+                  Checked="TsPrint_Checked"
+                  Unchecked="TsPrint_Unchecked"/>
+
+                    <!-- Print Button (right-aligned) -->
+                    <Image Grid.Column="1"
+                           Source="{DynamicResource bigprinter}" 
+                           x:Name="printerIMG" 
+                           Visibility="Visible"
+                           PreviewMouseLeftButtonDown="PrintButton_MouseLeftButtonDown" 
+                           Height="75"
+                           Margin="10,0,-17,0"
+                           ToolTip="Print Invoice"/>
+                </Grid>
+
+
+                <Grid Grid.Row="1" VerticalAlignment="Bottom" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Total Sale" Visibility="Collapsed" FontSize="17" FontFamily="{StaticResource OSBold}" Foreground="#323749" TextAlignment="Center"  Margin="20,-30,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    <TextBlock Text="£0.50" Grid.Row="1" x:Name="numTotalsale" Visibility="Collapsed" FontSize="54" FontFamily="{StaticResource OSBold}" Foreground="#323749" TextAlignment="Center"  Margin="10,0,0,0" HorizontalAlignment="Left"/>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Total Tendered" FontSize="17" FontFamily="{StaticResource OSBold}" Foreground="#323749" TextAlignment="Center"  Margin="0,-30,0,0" HorizontalAlignment="center" VerticalAlignment="Top"/>
+                    <TextBlock Text="£0.50" Grid.Row="1" Grid.Column="0" x:Name="numTender" FontSize="54" FontFamily="{StaticResource OSBold}" Foreground="#323749" TextAlignment="Center"  Margin="0,0,0,0" HorizontalAlignment="center"/>
+                    <TextBlock Grid.Row="0" Text="Change Due" Grid.Column="1" FontSize="17"  Foreground="#29bf6a" FontFamily="{StaticResource OSBold}"  Margin="0,-30,0,0" HorizontalAlignment="center"  VerticalAlignment="Top" Grid.ColumnSpan="2" ></TextBlock>
+                    <TextBlock Text="£0.50" Grid.Row="1" Grid.Column="1"  x:Name="numChangeDue" FontSize="54" Foreground="#29bf6a"  FontFamily="{StaticResource OSBold}" TextAlignment="Center"  Margin="0,0,0,0" HorizontalAlignment="center" Grid.ColumnSpan="2" />
+                </Grid>
+                <Button Focusable="False"  Grid.Row="2" Height="60" Width="532" Margin="3,25,3,0" Style="{DynamicResource PayButtonStyle16}" Content="DONE"  HorizontalContentAlignment="Center" VerticalAlignment="Top" Click="Button_Click"></Button>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

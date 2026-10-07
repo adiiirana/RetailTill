@@ -1,0 +1,197 @@
+<Window x:Class="OfflineRetailV2.UserControls.POSSection.frmPOSCalculator"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cc="clr-namespace:OfflineRetailV2.Controls"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        
+        Background="Transparent"
+        AllowsTransparency="True"
+        WindowStartupLocation="CenterScreen"
+        Width="420" Height="570">
+
+    <Window.Resources>
+        <!-- Base style for all buttons -->
+        <Style TargetType="Button">
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <!-- Keypad Button Style -->
+        <Style x:Key="KeypadButtonStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
+           
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="Background" Value="{DynamicResource CalculatorKeysBgColor}"/>
+            <Setter Property="BorderBrush" Value="#DDD"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="Width" Value="Auto"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="12"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Pay Now Button Style -->
+        <Style x:Key="PayNowButtonStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#29BF6A"/>
+            <Setter Property="Width" Value="280"/>
+            <Setter Property="Height" Value="53"/>
+            <Setter Property="BorderBrush" Value="{x:Null}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="10"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}">
+                                <ContentPresenter.Content>
+                                    <TextBlock Text="{TemplateBinding Content}"
+                                               Foreground="{TemplateBinding Foreground}"
+                                               FontWeight="{TemplateBinding FontWeight}"
+                                               FontSize="{TemplateBinding FontSize}"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"/>
+                                </ContentPresenter.Content>
+                            </ContentPresenter>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+
+        <!-- Make all TextBlocks bold -->
+        
+    </Window.Resources>
+    <cc:ModalWindow  x:Name="ModalWindow">
+        <Border Background="{DynamicResource ModalContentBackground}" CornerRadius="25" Padding="20" SnapsToDevicePixels="True">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Header -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Display -->
+                    <RowDefinition Height="23*"/>
+                    <RowDefinition Height="297*"/>
+                    <!-- Keypad -->
+                    <RowDefinition Height="Auto"/>
+                    <!-- Pay Now -->
+                </Grid.RowDefinitions>
+
+                <!-- Header (grey) -->
+                <Border Grid.Row="0"
+                    Background="{DynamicResource HeaderBackground}"
+                    CornerRadius="12,12,0,0"
+                    Padding="8">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <!-- spacer to keep title centered -->
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Invisible spacer matching close button size -->
+                        <Border Grid.Column="0" Width="36" Height="28" Visibility="Hidden"/>
+
+                        <!-- Centered title -->
+                        <TextBlock Grid.Column="1"
+                               Text="Name"
+                               FontSize="22"
+                                   FontFamily="{StaticResource PoppinsBold}"
+                               x:Name="lblCatName" 
+                              
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+
+                        <!-- Close button on the right -->
+                        <Button Grid.Column="2"
+                            Content="✕"
+                            Width="36" Height="28"
+                            Background="Transparent"
+                            BorderBrush="{x:Null}"
+                            Foreground="#777"
+                                Visibility="Visible"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Click="Close_Click"/>
+                    </Grid>
+                </Border>
+                <!-- Price Display -->
+                <TextBlock x:Name="txtDisplay"
+                       Grid.Row="1"
+                       Text="0.00"
+                       FontSize="40"
+                       FontFamily="{StaticResource PoppinsSemiBold}"
+                       Margin="0,20,0,10"
+                       HorizontalAlignment="Center"/>
+
+                <!-- Keypad -->
+                <UniformGrid Grid.Row="2" Columns="3" Rows="4" Margin="0,10,0,20" Grid.RowSpan="2">
+                    <!-- Row 1 -->
+                    <!-- Row 1 -->
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="1" Click="Key_Click" Margin="8,6,8,6"/>
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="2" Click="Key_Click" Margin="8,6,8,6"/>
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="3" Click="Key_Click" Margin="8,6,8,6"/>
+
+                    <!-- Row 2 -->
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="4" Click="Key_Click" Margin="8,6,8,6"/>
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="5" Click="Key_Click" Margin="8,6,8,6"/>
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="6" Click="Key_Click" Margin="8,6,8,6"/>
+
+                    <!-- Row 3 -->
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="7" Click="Key_Click" Margin="8,6,8,6"/>
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="8" Click="Key_Click" Margin="8,6,8,6"/>
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="9" Click="Key_Click" Margin="8,6,8,6"/>
+
+                    <!-- Row 4 -->
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="." Click="Key_Click" Margin="8,6,8,6"/>
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="0" Click="Key_Click" Margin="8,6,8,6"/>
+                    <Button Style="{StaticResource KeypadButtonStyle}" FontSize="24" Content="⌫" Click="Backspace_Click" Margin="8,6,8,6"/>
+                </UniformGrid>
+
+                <!-- Pay Now Button -->
+                <Button x:Name="btnPayNow" Grid.Row="4"
+                    FontSize="24"
+                    FontWeight="ExtraBold"
+                    Content="DONE"
+                    Style="{StaticResource PayNowButtonStyle}"
+                    Margin="10,2,116,1"
+                    Click="PayNow_Click" IsEnabled="False"  Width="NaN"/>
+                <Button x:Name="btnCloseAmount" 
+             Content="Clear"  Grid.Row="4" Height="53" Width="95"
+             Background="#BE0909"
+             BorderBrush="#fff"
+             Foreground="#fff"
+             FontSize="24" Style="{StaticResource PayNowButtonStyle}"
+             FontWeight="Bold"
+             HorizontalAlignment="Left"
+             VerticalAlignment="Top"
+             Click="btnCloseAmount_Click"  Margin="203,3,0,0"/>
+            </Grid>
+        </Border>
+    </cc:ModalWindow>
+</Window>

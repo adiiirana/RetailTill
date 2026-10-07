@@ -1,0 +1,2 @@
+ALTER TABLE [dbo].[Setup] ALTER COLUMN [ReceiptFooter] VARCHAR(MAX) NULL
+GO

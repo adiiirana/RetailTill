@@ -1,0 +1,272 @@
+﻿<Window x:Class="OfflineRetailV2.DualWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Dual Screen App V1" Width="1024" Height="768" WindowStyle="None">
+    <Grid Margin="-7,-7,-7,-7">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="379*"/>
+            <ColumnDefinition Width="133*"/>
+        </Grid.ColumnDefinitions>
+
+        <Rectangle Margin="0,137,0,0" Grid.ColumnSpan="2">
+            <Rectangle.Fill>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                    <GradientStop Color="#D5F4FA" Offset="0.0"/>
+                    <GradientStop Color="#FFFFFF" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <!-- Payment Success Screen -->
+        <Grid x:Name="GrdThankyou" Visibility="Collapsed" Grid.ColumnSpan="2">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0" Opacity="1">
+                    <GradientStop Color="#D5F4FA" Offset="0.0"/>
+                    <GradientStop Color="#FFFFFF" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <Image Source="/Resources/Images/TickSign.png" Width="169.89" Height="169.89" Margin="427.76,189.76,412.34,394.35"/>
+
+            <TextBlock x:Name="ThankyouTB" Text="Payment Successful" 
+                FontSize="48" 
+                Foreground="#2F304D" 
+                TextAlignment="Center" 
+                Margin="226,396,226,293" 
+                FontWeight="Bold" 
+                FontFamily="Open Sans" 
+                Height="65" 
+                Width="558"/>
+
+            <Image Source="/Resources/Images/XEPOS.png" Width="139.66" Height="33.42" Margin="435,651.56,435.34,69.02"/>
+        </Grid>
+
+        <!-- Payment Failed Screen -->
+        <Grid x:Name="GrdPaymentSuccess" Visibility="Collapsed" Grid.ColumnSpan="2">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                    <GradientStop Color="#D5F4FA" Offset="0.0"/>
+                    <GradientStop Color="#FFFFFF" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <Image Source="/Resources/Images/CrossSign.png" Width="169.89" Height="169.89" Margin="427.76,189.76,412.34,394.35"/>
+
+            <TextBlock Text="Payment UnSuccessful" 
+                FontSize="48" 
+                Foreground="#2F304D" 
+                TextAlignment="Center" 
+                Margin="226,396,226,293" 
+                FontWeight="Bold" 
+                FontFamily="Open Sans" 
+                Height="65" 
+                Width="558"/>
+
+            <Image Source="/Resources/Images/XEPOS.png" Width="139.66" Height="33.42" Margin="435,651.56,435.34,69.02"/>
+        </Grid>
+
+        <!-- Tap to Pay Screen -->
+        <Grid x:Name="GrdTapToPay" Visibility="Collapsed" Grid.ColumnSpan="2">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                    <GradientStop Color="#D5F4FA" Offset="0.0"/>
+                    <GradientStop Color="#FFFFFF" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <TextBlock Text="Insert, tap or swipe to Pay" 
+                    FontSize="37px" 
+                    Foreground="#2F304D" 
+                    TextAlignment="Center" 
+                    Margin="225,80,225,623" 
+                    FontWeight="Bold" 
+                    FontFamily="Open Sans" 
+                    Height="51" 
+                    Width="558"/>
+
+            <Border Background="White" Width="340" Margin="335,163,335,482" Height="112" CornerRadius="10">
+                <TextBlock x:Name="AmountToPayByTapTB" Text="£15.90"
+                   FontSize="87"
+                   FontWeight="Bold"
+                   FontFamily="Open Sans" 
+                   Foreground="#2F304D" TextAlignment="Center"/>
+            </Border>
+
+            <Image Source="/Resources/Images/hand-card-terminal.png" Width="308.69" Height="273.39" Margin="338,315.81,363.31,164.81"/>
+            <Image Source="/Resources/Images/XEPOS.png" Width="139.66" Height="33.42" Margin="435,651.56,435.34,69.02"/>
+        </Grid>
+
+        <!-- Pay Screen -->
+        <Grid x:Name="GrdPay" Visibility="Collapsed" Grid.ColumnSpan="2">
+            <Grid.Background>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                    <GradientStop Color="#D5F4FA" Offset="0.0"/>
+                    <GradientStop Color="#FFFFFF" Offset="1.0"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+
+            <TextBlock Text="Amount Due" 
+                FontSize="37px" 
+                Foreground="#2F304D" 
+                TextAlignment="Center" 
+                Margin="225,80,225,623" 
+                FontWeight="Bold" 
+                FontFamily="Open Sans" 
+                Height="51" 
+                Width="558"/>
+            <Border Background="White" Width="340" Margin="335,163,335,482" Height="112" CornerRadius="10">
+                <TextBlock x:Name="AmountToPayTB" Text="£15.90"
+                   FontSize="87"
+                   FontWeight="Bold"
+                   FontFamily="Open Sans" 
+                   Foreground="#2F304D" TextAlignment="Center"/>
+            </Border>
+
+            <Image Source="/Resources/Images/AmountDue.png" Height="273.39" Margin="369,316,363,165"/>
+            <Image Source="/Resources/Images/XEPOS.png" Width="139.66" Height="33.42" Margin="435,651.56,435.34,69.02"/>
+        </Grid>
+
+        <!-- Add Items Screen -->
+        <Grid x:Name="GrdAddItems" Visibility="Collapsed" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" x:Name="ContentColumn"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Background="Transparent" Height="38" VerticalAlignment="Top" CornerRadius="1" Margin="38,15,30,705">
+                <TextBlock x:Name="terminalnameTB" Text="Till No. 4" HorizontalAlignment="Right" TextAlignment="Right" 
+                       Margin="0,0,0,0" Width="264" Foreground="#2f304d" FontSize="22" FontFamily="Open Sans" FontWeight="Bold" Height="30"/>
+            </Border>
+
+            <Border Margin="38,59,38,212" Background="#FFFFFF" CornerRadius="10,10,0,0" Padding="10">
+                <Border.Effect>
+                    <DropShadowEffect Color="#00000014" BlurRadius="8" ShadowDepth="0" Opacity="0.2"/>
+                </Border.Effect>
+
+                <ScrollViewer x:Name="ScrollViewerControl" VerticalScrollBarVisibility="Hidden" Margin="38,59,38,0">
+                    <ItemsControl Name="ItemsList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0">
+                                    <Grid Margin="0,0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="2"/>
+                                        </Grid.RowDefinitions>
+
+                                        <StackPanel Orientation="Vertical" Grid.Row="0">
+                                            <Grid Margin="0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="3*"/>
+                                                    <ColumnDefinition Width="1*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding ItemName}" Grid.Column="0" 
+                                                   Margin="0,12.5,0,0" Foreground="#2f304d" 
+                                                   FontSize="20" FontFamily="Open Sans" 
+                                                   FontWeight="Bold" TextAlignment="Left"  
+                                                   HorizontalAlignment="Left"/>
+                                                <TextBlock Text="{Binding Price}" Grid.Column="1" 
+                                                   Margin="0,12.5,0,0" Foreground="#2f304d" 
+                                                   FontSize="20" FontFamily="Open Sans" 
+                                                   FontWeight="Bold" Height="34"   
+                                                   TextAlignment="Right" HorizontalAlignment="Right"
+                                                   VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <TextBlock Text="{Binding Description}" Margin="0,4,0,8" 
+                                                   Width="400" Foreground="#2f304d" FontSize="15" 
+                                                   FontFamily="Open Sans" FontWeight="Regular" 
+                                                   Height="27" TextAlignment="Left"   
+                                                   HorizontalAlignment="Left"/>
+                                        </StackPanel>
+
+                                        <Border VerticalAlignment="Bottom" Grid.Row="1" 
+                                        BorderThickness="0,0,0,0.5" BorderBrush="#2F304D"/>
+                                    </Grid>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+
+            <!-- Footer -->
+            <Border Background="#2f304d" Height="164" VerticalAlignment="Bottom" Margin="38,542,38,48" CornerRadius="0,0,10,10" Padding="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid Margin="38,28,45,27">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Sub total" TextAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Foreground="#FFFFFF" FontSize="21" FontWeight="SemiBold" FontFamily="Open Sans" Height="28"/>
+                        <Border Grid.Row="1" BorderThickness="0,0.5,0,0" BorderBrush="White" VerticalAlignment="Bottom"/>
+                        <TextBlock Text="Tax" Grid.Row="2" TextAlignment="Left" VerticalAlignment="Bottom" Foreground="#FFFFFF" FontSize="21" FontWeight="SemiBold" FontFamily="Open Sans" Height="28"/>
+                    </Grid>
+
+                    <Grid Margin="-50,28,30,27" Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Name="SubtotalText" Text="£0.00" TextAlignment="Right" VerticalAlignment="Top" Grid.Row="0" Foreground="#FFFFFF" FontSize="25" FontWeight="Bold" FontFamily="Open Sans" Height="34"/>
+                        <Border Grid.Row="1" BorderThickness="0,0.5,0,0" BorderBrush="White" VerticalAlignment="Bottom"/>
+                        <TextBlock Name="TaxText" Grid.Row="2" TextAlignment="Right" VerticalAlignment="Bottom" Text="£0.00" Foreground="#FFFFFF" FontSize="25" FontWeight="Bold" FontFamily="Open Sans" Height="34"/>
+                    </Grid>
+
+                    <Grid Margin="10,28,50,27" Grid.Column="2">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Discount" TextAlignment="Left" VerticalAlignment="Top" Grid.Row="0" Foreground="#FFFFFF" FontSize="21" FontWeight="SemiBold" FontFamily="Open Sans" Height="28"/>
+                        <Border Grid.Row="1" BorderThickness="0,0.5,0,0" BorderBrush="White" VerticalAlignment="Bottom"/>
+                        <TextBlock Text="Total" TextAlignment="Left" VerticalAlignment="Top" Grid.Row="2" Foreground="#FFFFFF" FontSize="29" FontWeight="Bold" FontFamily="Open Sans" Height="39"/>
+                    </Grid>
+
+                    <Grid Margin="-50,28,40,27" Grid.Column="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Name="DiscountText" TextAlignment="Right" VerticalAlignment="Top" Grid.Row="0" Text="£0.00" Foreground="#FFFFFF" FontSize="25" FontWeight="Bold" FontFamily="Open Sans" Height="34"/>
+                        <Border Grid.Row="1" BorderThickness="0,0.5,0,0" BorderBrush="White" VerticalAlignment="Bottom"/>
+                        <TextBlock Name="TotalText" Grid.Row="2" TextAlignment="Right" VerticalAlignment="Bottom" Text="£0.00" Foreground="#64c5d9" FontSize="30" FontWeight="Bold" FontFamily="Open Sans" Height="40"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Welcome Screen -->
+        <Grid x:Name="GrdWelcome" Visibility="Visible" Grid.ColumnSpan="2" RenderTransformOrigin="0.5,0.5">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel x:Name="BrandLogo" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" Visibility="Visible">
+                    <Image Source="/Resources/Images/XEPOS.png" Width="140" Height="33" Margin="435,393.5,435.34,393.5"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- Video Screen -->
+        <Grid x:Name="GrdVideo" Visibility="Collapsed" Background="Black" Grid.ColumnSpan="2">
+            <MediaElement x:Name="VideoPlayer1" 
+              LoadedBehavior="Manual" 
+              UnloadedBehavior="Stop" 
+              MediaEnded="VideoPlayer1_MediaEnded" 
+              Stretch="Uniform" 
+              Volume="0"/>
+        </Grid>
+
+        <!-- Image Screen -->
+        <Grid x:Name="GrdImage" Visibility="Collapsed" Background="Black" Grid.ColumnSpan="2">
+            <Image x:Name="ImageViewer" Stretch="Uniform"/>
+        </Grid>
+    </Grid>
+</Window>

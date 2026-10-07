@@ -1,0 +1,20 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ✅ Existing Open Sans fonts -->
+    <FontFamily x:Key="OSRegular">/Resources/Fonts/#Open Sans Regular</FontFamily>
+    <FontFamily x:Key="OSLight">/Resources/Fonts/#Open Sans Light</FontFamily>
+    <FontFamily x:Key="OSBold">/Resources/Fonts/#Open Sans Bold</FontFamily>
+    <FontFamily x:Key="OSSemiBold">/Resources/Fonts/#Open Sans Semibold</FontFamily>
+
+    <!-- ✅ Added Poppins font families -->
+    <FontFamily x:Key="PoppinsThin">/Resources/Fonts/#Poppins Thin</FontFamily>
+    <FontFamily x:Key="PoppinsExtraLight">/Resources/Fonts/#Poppins ExtraLight</FontFamily>
+    <FontFamily x:Key="PoppinsLight">/Resources/Fonts/#Poppins Light</FontFamily>
+    <FontFamily x:Key="PoppinsRegular">/Resources/Fonts/#Poppins</FontFamily>
+    <FontFamily x:Key="PoppinsMedium">/Resources/Fonts/#Poppins Medium</FontFamily>
+    <FontFamily x:Key="PoppinsSemiBold">/Resources/Fonts/#Poppins SemiBold</FontFamily>
+    <FontFamily x:Key="PoppinsBold">/Resources/Fonts/#Poppins Bold</FontFamily>
+    <FontFamily x:Key="PoppinsExtraBold">/Resources/Fonts/#Poppins ExtraBold</FontFamily>
+    <FontFamily x:Key="PoppinsBlack">/Resources/Fonts/#Poppins Black</FontFamily>
+</ResourceDictionary>

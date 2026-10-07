@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="OfflineRetailV2.UserControls.POSSection.CustomToggle"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="50" Height="25">
+    <Grid>
+        <!-- Background -->
+        <Border x:Name="SwitchBackground"
+                CornerRadius="12.5"
+                Background="#009999"
+                Width="50" Height="25"/>
+
+        <!-- Knob -->
+        <Ellipse x:Name="Knob"
+                 Width="19" Height="19"
+                 Fill="White"
+                 HorizontalAlignment="Left"
+                 Margin="3,3,0,3">
+            <Ellipse.RenderTransform>
+                <TranslateTransform x:Name="KnobTransform"/>
+            </Ellipse.RenderTransform>
+        </Ellipse>
+
+        <!-- Transparent ToggleButton for click handling -->
+        <ToggleButton x:Name="Toggle"
+                      Background="Transparent"
+                      BorderBrush="{x:Null}"
+                      Width="50" Height="25"
+                      Checked="Toggle_Checked"
+                      Unchecked="Toggle_Unchecked"
+                      Focusable="False"/>
+    </Grid>
+</UserControl>

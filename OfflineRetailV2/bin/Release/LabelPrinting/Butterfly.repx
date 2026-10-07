@@ -1,0 +1,227 @@
+/// <XRTypeInfo>
+///   <AssemblyFullName>OfflineRetailV2, Version=1.7.4.0, Culture=neutral, PublicKeyToken=null</AssemblyFullName>
+///   <AssemblyLocation>C:\MyProducts\XEPOS\XE_Retail-WPF-master\OfflineRetailV2\bin\Debug\OfflineRetailV2.exe</AssemblyLocation>
+///   <TypeName>OfflineRetailV2.Report.Product.Butterfly</TypeName>
+///   <Localization>en-US</Localization>
+///   <Version>23.1</Version>
+///   <References>
+///     <Reference Path="C:\MyProducts\XEPOS\XE_Retail-WPF-master\OfflineRetailV2\bin\Debug\OfflineRetailV2.exe" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\PresentationFramework\v4.0_4.0.0.0__31bf3856ad364e35\PresentationFramework.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Xaml\v4.0_4.0.0.0__b77a5c561934e089\System.Xaml.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System\v4.0_4.0.0.0__b77a5c561934e089\System.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Configuration\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Configuration.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Xml\v4.0_4.0.0.0__b77a5c561934e089\System.Xml.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Core\v4.0_4.0.0.0__b77a5c561934e089\System.Core.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Numerics\v4.0_4.0.0.0__b77a5c561934e089\System.Numerics.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\WindowsBase\v4.0_4.0.0.0__31bf3856ad364e35\WindowsBase.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\Accessibility\v4.0_4.0.0.0__b03f5f7f11d50a3a\Accessibility.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_32\PresentationCore\v4.0_4.0.0.0__31bf3856ad364e35\PresentationCore.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\UIAutomationTypes\v4.0_4.0.0.0__31bf3856ad364e35\UIAutomationTypes.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\UIAutomationProvider\v4.0_4.0.0.0__31bf3856ad364e35\UIAutomationProvider.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\PresentationUI\v4.0_4.0.0.0__31bf3856ad364e35\PresentationUI.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Windows.Forms\v4.0_4.0.0.0__b77a5c561934e089\System.Windows.Forms.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Drawing\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Drawing.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Utils.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Utils.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.ComponentModel.DataAnnotations\v4.0_4.0.0.0__31bf3856ad364e35\System.ComponentModel.DataAnnotations.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Data.Desktop.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Data.Desktop.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_32\System.Data\v4.0_4.0.0.0__b77a5c561934e089\System.Data.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_32\System.Transactions\v4.0_4.0.0.0__b77a5c561934e089\System.Transactions.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_32\System.EnterpriseServices\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.EnterpriseServices.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Runtime.Caching\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Runtime.Caching.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraEditors.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraEditors.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraBars.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraBars.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Grid.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Grid.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Core.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Core.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Mvvm.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Mvvm.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Runtime.Serialization\v4.0_4.0.0.0__b77a5c561934e089\System.Runtime.Serialization.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.ServiceModel.Internals\v4.0_4.0.0.0__31bf3856ad364e35\System.ServiceModel.Internals.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\SMDiagnostics\v4.0_4.0.0.0__b77a5c561934e089\SMDiagnostics.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.ServiceModel\v4.0_4.0.0.0__b77a5c561934e089\System.ServiceModel.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Xml.Linq\v4.0_4.0.0.0__b77a5c561934e089\System.Xml.Linq.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Net.Http\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Net.Http.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\Microsoft.CSharp\v4.0_4.0.0.0__b03f5f7f11d50a3a\Microsoft.CSharp.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Dynamic\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Dynamic.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Grid.v23.1.Core\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Grid.v23.1.Core.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.ReportDesigner.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.ReportDesigner.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Printing.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Printing.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.DocumentViewer.v23.1.Core\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.DocumentViewer.v23.1.Core.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Ribbon.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Ribbon.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Docking.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Docking.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Layout.v23.1.Core\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Layout.v23.1.Core.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.LayoutControl.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.LayoutControl.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Diagram.v23.1.Core\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Diagram.v23.1.Core.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Diagram.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Diagram.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.PropertyGrid.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.PropertyGrid.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Images.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Images.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.RichEdit.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.RichEdit.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Office.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Office.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.DataAccess.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.DataAccess.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.ExpressionEditor.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.ExpressionEditor.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.PivotGrid.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.PivotGrid.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Charts.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Charts.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.DataVisualization.v23.1.Core\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.DataVisualization.v23.1.Core.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Controls.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Controls.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.CodeView.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.CodeView.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\Microsoft.PointOfService\v4.0_1.14.1.0__31bf3856ad364e35\Microsoft.PointOfService.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraGrid.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraGrid.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraLayout.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraLayout.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraPrinting.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraPrinting.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraTreeList.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraTreeList.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.NavBar.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.NavBar.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Xpf.Scheduling.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Xpf.Scheduling.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraScheduler.v23.1.Core\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraScheduler.v23.1.Core.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraScheduler.v23.1.Core.Desktop\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraScheduler.v23.1.Core.Desktop.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraReports.v23.1.Extensions\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraReports.v23.1.Extensions.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\System.Design\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Design.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_32\System.Web\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Web.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.Utils.v23.1.UI\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.Utils.v23.1.UI.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraRichEdit.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraRichEdit.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraVerticalGrid.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraVerticalGrid.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.DataAccess.v23.1.UI\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.DataAccess.v23.1.UI.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraDiagram.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraDiagram.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraNavBar.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraNavBar.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraCharts.v23.1.Wizard\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraCharts.v23.1.Wizard.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraPivotGrid.v23.1\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraPivotGrid.v23.1.dll" />
+///     <Reference Path="C:\windows\Microsoft.Net\assembly\GAC_MSIL\DevExpress.XtraCharts.v23.1.Extensions\v4.0_23.1.3.0__b88d1754d700e49a\DevExpress.XtraCharts.v23.1.Extensions.dll" />
+///   </References>
+///   <Resources>
+///     <Resource Name="XtraReportSerialization.Butterfly">
+/// zsrvvgEAAACRAAAAbFN5c3RlbS5SZXNvdXJjZXMuUmVzb3VyY2VSZWFkZXIsIG1zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVibGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OSNTeXN0ZW0uUmVzb3VyY2VzLlJ1bnRpbWVSZXNvdXJjZVNldAIAAAAAAAAAAAAAAFBBRFBBRFC0AAAA</Resource>
+///   </Resources>
+/// </XRTypeInfo>
+namespace XtraReportSerialization {
+    
+    public class Butterfly : DevExpress.XtraReports.UI.XtraReport {
+        private DevExpress.XtraReports.UI.XRLabel lbPrice;
+        private DevExpress.XtraReports.UI.DetailBand Detail;
+        private DevExpress.XtraReports.UI.XRBarCode lbBarCode;
+        private DevExpress.XtraReports.UI.XRLabel lbProduct;
+        private DevExpress.XtraReports.UI.XRLabel lbSKU;
+        private DevExpress.XtraReports.UI.BottomMarginBand bottomMarginBand1;
+        private DevExpress.XtraReports.UI.TopMarginBand topMarginBand1;
+        private System.Resources.ResourceManager _resources;
+        private string _resourceString;
+        public Butterfly() {
+            this._resourceString = DevExpress.XtraReports.Serialization.XRResourceManager.GetResourceFor("XtraReportSerialization.Butterfly");
+            this.InitializeComponent();
+        }
+        private System.Resources.ResourceManager resources {
+            get {
+                if (_resources == null) {
+                    this._resources = new DevExpress.XtraReports.Serialization.XRResourceManager(this._resourceString);
+                }
+                return this._resources;
+            }
+        }
+        private void InitializeComponent() {
+            DevExpress.XtraPrinting.BarCode.Code128Generator code128Generator1 = new DevExpress.XtraPrinting.BarCode.Code128Generator();
+            this.lbPrice = new DevExpress.XtraReports.UI.XRLabel();
+            this.Detail = new DevExpress.XtraReports.UI.DetailBand();
+            this.bottomMarginBand1 = new DevExpress.XtraReports.UI.BottomMarginBand();
+            this.lbSKU = new DevExpress.XtraReports.UI.XRLabel();
+            this.topMarginBand1 = new DevExpress.XtraReports.UI.TopMarginBand();
+            this.lbProduct = new DevExpress.XtraReports.UI.XRLabel();
+            this.lbBarCode = new DevExpress.XtraReports.UI.XRBarCode();
+            ((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
+            // 
+            // lbPrice
+            // 
+            this.lbPrice.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+                        new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[PRICE]")});
+            this.lbPrice.Font = new DevExpress.Drawing.DXFont("Arial", 6.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+                        new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
+            this.lbPrice.LocationFloat = new DevExpress.Utils.PointFloat(233F, 20F);
+            this.lbPrice.Name = "lbPrice";
+            this.lbPrice.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.lbPrice.SizeF = new System.Drawing.SizeF(73F, 16F);
+            this.lbPrice.Text = "lbPrice";
+            this.lbPrice.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            // 
+            // Detail
+            // 
+            this.Detail.BorderWidth = 0F;
+            this.Detail.Controls.AddRange(new DevExpress.XtraReports.UI.XRControl[] {
+                        this.lbPrice,
+                        this.lbBarCode,
+                        this.lbProduct,
+                        this.lbSKU});
+            this.Detail.HeightF = 68F;
+            this.Detail.Name = "Detail";
+            this.Detail.Padding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
+            this.Detail.SnapLinePadding = new DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100F);
+            this.Detail.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft;
+            // 
+            // bottomMarginBand1
+            // 
+            this.bottomMarginBand1.HeightF = 0F;
+            this.bottomMarginBand1.Name = "bottomMarginBand1";
+            // 
+            // lbSKU
+            // 
+            this.lbSKU.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+                        new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[SKU]")});
+            this.lbSKU.Font = new DevExpress.Drawing.DXFont("Arial", 6.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+                        new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
+            this.lbSKU.LocationFloat = new DevExpress.Utils.PointFloat(108F, 0F);
+            this.lbSKU.Name = "lbSKU";
+            this.lbSKU.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.lbSKU.SizeF = new System.Drawing.SizeF(84F, 12F);
+            this.lbSKU.Text = "lbSKU";
+            this.lbSKU.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft;
+            // 
+            // topMarginBand1
+            // 
+            this.topMarginBand1.HeightF = 0F;
+            this.topMarginBand1.Name = "topMarginBand1";
+            // 
+            // lbProduct
+            // 
+            this.lbProduct.CanGrow = false;
+            this.lbProduct.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+                        new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[DESC]")});
+            this.lbProduct.Font = new DevExpress.Drawing.DXFont("Arial", 6.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+                        new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
+            this.lbProduct.LocationFloat = new DevExpress.Utils.PointFloat(107F, 14F);
+            this.lbProduct.Name = "lbProduct";
+            this.lbProduct.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
+            this.lbProduct.SizeF = new System.Drawing.SizeF(78F, 32F);
+            this.lbProduct.Text = "lbProduct";
+            this.lbProduct.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft;
+            // 
+            // lbBarCode
+            // 
+            this.lbBarCode.AutoModule = true;
+            this.lbBarCode.BarCodeOrientation = DevExpress.XtraPrinting.BarCode.BarCodeOrientation.UpsideDown;
+            this.lbBarCode.ExpressionBindings.AddRange(new DevExpress.XtraReports.UI.ExpressionBinding[] {
+                        new DevExpress.XtraReports.UI.ExpressionBinding("BeforePrint", "Text", "[SKU]")});
+            this.lbBarCode.Font = new DevExpress.Drawing.DXFont("Arial", 6F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+                        new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
+            this.lbBarCode.LocationFloat = new DevExpress.Utils.PointFloat(233F, 0F);
+            this.lbBarCode.Module = 1F;
+            this.lbBarCode.Name = "lbBarCode";
+            this.lbBarCode.Padding = new DevExpress.XtraPrinting.PaddingInfo(10, 10, 0, 0, 100F);
+            this.lbBarCode.ShowText = false;
+            this.lbBarCode.SizeF = new System.Drawing.SizeF(73F, 20F);
+            this.lbBarCode.Symbology = code128Generator1;
+            this.lbBarCode.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter;
+            // 
+            // Butterfly
+            // 
+            this.Bands.AddRange(new DevExpress.XtraReports.UI.Band[] {
+                        this.Detail,
+                        this.topMarginBand1,
+                        this.bottomMarginBand1});
+            this.BorderWidth = 0F;
+            this.Font = new DevExpress.Drawing.DXFont("Arial", 6.75F, DevExpress.Drawing.DXFontStyle.Regular, DevExpress.Drawing.DXGraphicsUnit.Point, new DevExpress.Drawing.DXFontAdditionalProperty[] {
+                        new DevExpress.Drawing.DXFontAdditionalProperty("GdiCharSet", ((byte)(0)))});
+            this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.Margins = new DevExpress.Drawing.DXMargins(0F, 0F, 0F, 0F);
+            this.Name = "Butterfly";
+            this.PageHeight = 70;
+            this.PageWidth = 315;
+            this.PaperKind = DevExpress.Drawing.Printing.DXPaperKind.Custom;
+            this.Version = "23.1";
+            ((System.ComponentModel.ISupportInitialize)(this)).EndInit();
+        }
+    }
+}
