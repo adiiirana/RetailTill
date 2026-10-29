@@ -5522,6 +5522,7 @@ namespace PosDataObject
                 {
                     strError = UpdateXEROInfo(SaveComm);
                 }
+                strError = SaveSumUpInfo(SaveComm);
 
                 if (blPOSFunctionUpdate)
                     AdjustPOSFunctions(SaveComm);
@@ -10683,6 +10684,66 @@ namespace PosDataObject
 
         #endregion
 
+
+        #region SumUp
+
+        private string strSumUpIsActive = "N";
+        private string strSumUpApiKey = "";
+        private string strSumUpMerchantCode = "";
+        private string strSumUpAffiliateKey = "";
+        private string strSumUpAppId = "";
+        private string strSumUpCurrency = "GBP";
+        private string strSumUpReaderId = "";
+        private string strSumUpReaderName = "";
+
+        public string SumUpIsActive { get { return strSumUpIsActive; } set { strSumUpIsActive = value; } }
+        public string SumUpApiKey { get { return strSumUpApiKey; } set { strSumUpApiKey = value; } }
+        public string SumUpMerchantCode { get { return strSumUpMerchantCode; } set { strSumUpMerchantCode = value; } }
+        public string SumUpAffiliateKey { get { return strSumUpAffiliateKey; } set { strSumUpAffiliateKey = value; } }
+        public string SumUpAppId { get { return strSumUpAppId; } set { strSumUpAppId = value; } }
+        public string SumUpCurrency { get { return strSumUpCurrency; } set { strSumUpCurrency = value; } }
+        public string SumUpReaderId { get { return strSumUpReaderId; } set { strSumUpReaderId = value; } }
+        public string SumUpReaderName { get { return strSumUpReaderName; } set { strSumUpReaderName = value; } }
+
+        private string SaveSumUpInfo(SqlCommand objSQlComm)
+        {
+            string strErrMsg = "";
+            try
+            {
+                objSQlComm.Parameters.Clear();
+                objSQlComm.CommandText = " select count(*) from SumUpInfo ";
+                int cnt = Convert.ToInt32(objSQlComm.ExecuteScalar());
+
+                objSQlComm.Parameters.Clear();
+                if (cnt == 0)
+                {
+                    objSQlComm.CommandText = " insert into SumUpInfo(IsActive, ApiKey, MerchantCode, AffiliateKey, AppId, Currency, ReaderId, ReaderName) "
+                        + " values (@IsActive, @ApiKey, @MerchantCode, @AffiliateKey, @AppId, @Currency, @ReaderId, @ReaderName) ";
+                }
+                else
+                {
+                    objSQlComm.CommandText = " update SumUpInfo set IsActive=@IsActive, ApiKey=@ApiKey, MerchantCode=@MerchantCode, AffiliateKey=@AffiliateKey, "
+                        + " AppId=@AppId, Currency=@Currency, ReaderId=@ReaderId, ReaderName=@ReaderName ";
+                }
+
+                objSQlComm.Parameters.Add(new SqlParameter("@IsActive", System.Data.SqlDbType.Char)).Value = strSumUpIsActive;
+                objSQlComm.Parameters.Add(new SqlParameter("@ApiKey", System.Data.SqlDbType.NVarChar)).Value = strSumUpApiKey;
+                objSQlComm.Parameters.Add(new SqlParameter("@MerchantCode", System.Data.SqlDbType.NVarChar)).Value = strSumUpMerchantCode;
+                objSQlComm.Parameters.Add(new SqlParameter("@AffiliateKey", System.Data.SqlDbType.NVarChar)).Value = strSumUpAffiliateKey;
+                objSQlComm.Parameters.Add(new SqlParameter("@AppId", System.Data.SqlDbType.NVarChar)).Value = strSumUpAppId;
+                objSQlComm.Parameters.Add(new SqlParameter("@Currency", System.Data.SqlDbType.NVarChar)).Value = strSumUpCurrency;
+                objSQlComm.Parameters.Add(new SqlParameter("@ReaderId", System.Data.SqlDbType.NVarChar)).Value = strSumUpReaderId;
+                objSQlComm.Parameters.Add(new SqlParameter("@ReaderName", System.Data.SqlDbType.NVarChar)).Value = strSumUpReaderName;
+                objSQlComm.ExecuteNonQuery();
+            }
+            catch (SqlException SQLDBException)
+            {
+                strErrMsg = SQLDBException.Message;
+            }
+            return strErrMsg;
+        }
+
+        #endregion
 
         public DataTable FetchSalesDataForQuickBooksOnline()
         {

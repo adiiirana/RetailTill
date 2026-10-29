@@ -3971,6 +3971,16 @@ namespace OfflineRetailV2.UserControls.Administrator
             txtXeroAccount5.Text = Settings.XeroCOGSAccountCodePurchase;
             txtXeroAccount6.Text = Settings.XeroCOGSAccountCodeSale;
 
+            Settings.LoadSumUpSettings();
+            chkSumUpActive.IsChecked = Settings.SumUpIsActive == "Y";
+            txtSumUpApiKey.Text = Settings.SumUpApiKey;
+            txtSumUpMerchantCode.Text = Settings.SumUpMerchantCode;
+            txtSumUpAffiliateKey.Text = Settings.SumUpAffiliateKey;
+            txtSumUpAppId.Text = Settings.SumUpAppId;
+            txtSumUpCurrency.Text = Settings.SumUpCurrency;
+            txtSumUpReaderId.Text = Settings.SumUpReaderId;
+            txtSumUpReaderName.Text = Settings.SumUpReaderName;
+
             // office info
             txtCompany.Text = Settings.RegCompanyName;
             txtAdd1.Text = Settings.RegAddress1;
@@ -5371,6 +5381,15 @@ namespace OfflineRetailV2.UserControls.Administrator
             objSetup.XeroCOGSAccountCodePurchase = txtXeroAccount5.Text == null ? "" : txtXeroAccount5.Text.Trim();
             objSetup.XeroCOGSAccountCodeSale = txtXeroAccount6.Text == null ? "" : txtXeroAccount6.Text.Trim();
 
+            objSetup.SumUpIsActive = chkSumUpActive.IsChecked == true ? "Y" : "N";
+            objSetup.SumUpApiKey = (txtSumUpApiKey.Text ?? "").Trim();
+            objSetup.SumUpMerchantCode = (txtSumUpMerchantCode.Text ?? "").Trim();
+            objSetup.SumUpAffiliateKey = (txtSumUpAffiliateKey.Text ?? "").Trim();
+            objSetup.SumUpAppId = (txtSumUpAppId.Text ?? "").Trim();
+            objSetup.SumUpCurrency = string.IsNullOrWhiteSpace(txtSumUpCurrency.Text) ? "GBP" : txtSumUpCurrency.Text.Trim().ToUpper();
+            objSetup.SumUpReaderId = (txtSumUpReaderId.Text ?? "").Trim();
+            objSetup.SumUpReaderName = (txtSumUpReaderName.Text ?? "").Trim();
+
             if (pictPhoto.Source != null)
             {
                 objSetup.Logo = GeneralFunctions.ConvertBitmapSourceToByteArray(pictPhoto.Source);
@@ -6407,6 +6426,113 @@ namespace OfflineRetailV2.UserControls.Administrator
         private void TpIntegration_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             OldTabIndex = 11;
+        }
+
+        private void TpSumUp_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            OldTabIndex = 12;
+        }
+
+        private OfflineRetailV2.SumUp.SumUpClient CreateSumUpClient()
+        {
+            string key = (txtSumUpApiKey.Text ?? "").Trim();
+            string merchant = (txtSumUpMerchantCode.Text ?? "").Trim();
+            if (key == "")
+            {
+                DocMessage.MsgEnter("SumUp API Key");
+                return null;
+            }
+            if (merchant == "")
+            {
+                DocMessage.MsgEnter("SumUp Merchant Code");
+                return null;
+            }
+            return new OfflineRetailV2.SumUp.SumUpClient(key, merchant);
+        }
+
+        private async void BtnSumUpTest_Click(object sender, RoutedEventArgs e)
+        {
+            var client = CreateSumUpClient();
+            if (client == null) return;
+
+            btnSumUpTest.IsEnabled = false;
+            try
+            {
+                var readers = await client.ListReadersAsync();
+                DocMessage.MsgInformation("Connected to SumUp successfully." + "\r\n" + "Readers paired to this merchant: " + readers.Count);
+            }
+            catch (Exception ex)
+            {
+                DocMessage.MsgError("SumUp connection failed." + "\r\n" + ex.Message);
+            }
+            finally
+            {
+                btnSumUpTest.IsEnabled = true;
+            }
+        }
+
+        private async void BtnSumUpPair_Click(object sender, RoutedEventArgs e)
+        {
+            var client = CreateSumUpClient();
+            if (client == null) return;
+
+            string code = (txtSumUpPairCode.Text ?? "").Trim();
+            string name = (txtSumUpReaderName.Text ?? "").Trim();
+            if (code == "")
+            {
+                DocMessage.MsgEnter("Pairing Code");
+                return;
+            }
+            if (name == "")
+            {
+                DocMessage.MsgEnter("Reader Name");
+                return;
+            }
+
+            btnSumUpPair.IsEnabled = false;
+            try
+            {
+                var reader = await client.PairReaderAsync(code, name);
+                txtSumUpReaderId.Text = reader.Id;
+                txtSumUpPairCode.Text = "";
+                DocMessage.MsgInformation("Reader paired (status: " + reader.Status + ")." + "\r\n" + "Click Save to keep these settings.");
+            }
+            catch (Exception ex)
+            {
+                DocMessage.MsgError("Could not pair the reader." + "\r\n" + ex.Message);
+            }
+            finally
+            {
+                btnSumUpPair.IsEnabled = true;
+            }
+        }
+
+        private async void BtnSumUpUnpair_Click(object sender, RoutedEventArgs e)
+        {
+            string readerId = (txtSumUpReaderId.Text ?? "").Trim();
+            if (readerId == "")
+            {
+                DocMessage.MsgInformation("No reader is paired.");
+                return;
+            }
+            var client = CreateSumUpClient();
+            if (client == null) return;
+
+            btnSumUpUnpair.IsEnabled = false;
+            try
+            {
+                await client.DeleteReaderAsync(readerId);
+                txtSumUpReaderId.Text = "";
+                DocMessage.MsgInformation("Reader removed from SumUp." + "\r\n" + "Click Save to keep these settings.");
+            }
+            catch (Exception ex)
+            {
+                DocMessage.MsgError("Could not remove the reader." + "\r\n" + ex.Message);
+            }
+            finally
+            {
+                btnSumUpUnpair.IsEnabled = true;
+            }
         }
 
         private bool IsValidDefaultService()

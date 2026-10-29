@@ -86,11 +86,11 @@
   <ItemGroup>
     <Reference Include="alabel, Version=3.0.0.1, Culture=neutral, PublicKeyToken=d531470845f8eb5a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Refs\alabel.DLL</HintPath>
+      <HintPath>Refs\alabel.DLL</HintPath>
     </Reference>
     <Reference Include="AxInterop.WMPLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Refs\AxInterop.WMPLib.dll</HintPath>
+      <HintPath>Refs\AxInterop.WMPLib.dll</HintPath>
     </Reference>
     <Reference Include="BookersIntegration">
       <HintPath>bin\Debug\BookersIntegration.dll</HintPath>
@@ -237,7 +237,7 @@
       <HintPath>bin\Debug\DocManagerControls.DLL</HintPath>
     </Reference>
     <Reference Include="Interop.WMPLib">
-      <HintPath>..\..\..\Refs\Interop.WMPLib.dll</HintPath>
+      <HintPath>Refs\Interop.WMPLib.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -759,6 +759,7 @@
     <Compile Include="PosDataObject\clsScales.cs" />
     <Compile Include="PosDataObject\clsSecurity.cs" />
     <Compile Include="PosDataObject\clsSetup.cs" />
+    <Compile Include="SumUp\SumUpClient.cs" />
     <Compile Include="PosDataObject\clsShift.cs" />
     <Compile Include="PosDataObject\clsStockJournal.cs" />
     <Compile Include="PosDataObject\clsTax.cs" />

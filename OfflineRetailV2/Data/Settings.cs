@@ -5928,6 +5928,58 @@ namespace OfflineRetailV2.Data
             }
         }
 
+        #region SumUp
+
+        public static string SumUpIsActive { get; set; } = "N";
+        public static string SumUpApiKey { get; set; } = "";
+        public static string SumUpMerchantCode { get; set; } = "";
+        public static string SumUpAffiliateKey { get; set; } = "";
+        public static string SumUpAppId { get; set; } = "";
+        public static string SumUpCurrency { get; set; } = "GBP";
+        public static string SumUpReaderId { get; set; } = "";
+        public static string SumUpReaderName { get; set; } = "";
+
+        public static void LoadSumUpSettings()
+        {
+            SumUpIsActive = "N";
+            SumUpApiKey = "";
+            SumUpMerchantCode = "";
+            SumUpAffiliateKey = "";
+            SumUpAppId = "";
+            SumUpCurrency = "GBP";
+            SumUpReaderId = "";
+            SumUpReaderName = "";
+
+            using (SqlConnection conn = new SqlConnection(SystemVariables.ConnectionString))
+            using (SqlCommand cmd = new SqlCommand(" select top 1 * from SumUpInfo ", conn))
+            {
+                try
+                {
+                    conn.Open();
+                    using (SqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        if (rdr.Read())
+                        {
+                            SumUpIsActive = rdr["IsActive"].ToString();
+                            SumUpApiKey = rdr["ApiKey"].ToString();
+                            SumUpMerchantCode = rdr["MerchantCode"].ToString();
+                            SumUpAffiliateKey = rdr["AffiliateKey"].ToString();
+                            SumUpAppId = rdr["AppId"].ToString();
+                            SumUpCurrency = rdr["Currency"].ToString();
+                            SumUpReaderId = rdr["ReaderId"].ToString();
+                            SumUpReaderName = rdr["ReaderName"].ToString();
+                        }
+                    }
+                }
+                catch (SqlException)
+                {
+                    // SumUpInfo table is created by DB script 112.0sql1.sql
+                }
+            }
+        }
+
+        #endregion
+
         public static void LoadXEROSettings()
         {
             strXeroCompanyName = Settings.Company;
