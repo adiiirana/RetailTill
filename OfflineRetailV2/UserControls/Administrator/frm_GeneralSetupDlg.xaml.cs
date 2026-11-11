@@ -1,4 +1,4 @@
-using DevExpress.Xpf.Core;
+﻿using DevExpress.Xpf.Core;
 using DevExpress.Xpf.Editors;
 using DevExpress.Xpf.Grid;
 using Microsoft.PointOfService;
@@ -1888,6 +1888,15 @@ namespace OfflineRetailV2.UserControls.Administrator
                 rgCardEntryMode_1.Visibility = Visibility.Hidden;
                 btnDEMV.Visibility = Visibility.Hidden;
                 tcPayment.SelectedIndex = 9;
+            }
+            if (rgPaymentGateway_10.IsChecked == true)
+            {
+                rgPaymentMode_0.Visibility = Visibility.Hidden;
+                rgPaymentMode_1.Visibility = Visibility.Hidden;
+                rgCardEntryMode_0.Visibility = Visibility.Hidden;
+                rgCardEntryMode_1.Visibility = Visibility.Hidden;
+                btnDEMV.Visibility = Visibility.Hidden;
+                tcPayment.SelectedIndex = 10;
             }
         }
 
@@ -3971,15 +3980,8 @@ namespace OfflineRetailV2.UserControls.Administrator
             txtXeroAccount5.Text = Settings.XeroCOGSAccountCodePurchase;
             txtXeroAccount6.Text = Settings.XeroCOGSAccountCodeSale;
 
-            Settings.LoadSumUpSettings();
-            chkSumUpActive.IsChecked = Settings.SumUpIsActive == "Y";
-            txtSumUpApiKey.Text = Settings.SumUpApiKey;
-            txtSumUpMerchantCode.Text = Settings.SumUpMerchantCode;
-            txtSumUpAffiliateKey.Text = Settings.SumUpAffiliateKey;
-            txtSumUpAppId.Text = Settings.SumUpAppId;
-            txtSumUpCurrency.Text = Settings.SumUpCurrency;
-            txtSumUpReaderId.Text = Settings.SumUpReaderId;
-            txtSumUpReaderName.Text = Settings.SumUpReaderName;
+            LoadSumUpTab();
+            LoadSumUpPayments();
 
             // office info
             txtCompany.Text = Settings.RegCompanyName;
@@ -4212,6 +4214,8 @@ namespace OfflineRetailV2.UserControls.Administrator
             if (Settings.PaymentGateway == 8) rgPaymentGateway_7.IsChecked = true;
             if (Settings.PaymentGateway == 9) rgPaymentGateway_8.IsChecked = true;
             if (Settings.PaymentGateway == 10) rgPaymentGateway_9.IsChecked = true;
+
+            if (Settings.PaymentGateway == 11) rgPaymentGateway_10.IsChecked = true;
 
             pay8_XEConnectPath.Text = Settings.EvoConnectFileLocation;
             pay8_Api.Text = Settings.EvoApi;
@@ -5380,8 +5384,8 @@ namespace OfflineRetailV2.UserControls.Administrator
             objSetup.XeroAccountCodeSale = txtXeroAccount4.Text == null ? "" : txtXeroAccount4.Text.Trim();
             objSetup.XeroCOGSAccountCodePurchase = txtXeroAccount5.Text == null ? "" : txtXeroAccount5.Text.Trim();
             objSetup.XeroCOGSAccountCodeSale = txtXeroAccount6.Text == null ? "" : txtXeroAccount6.Text.Trim();
-
-            objSetup.SumUpIsActive = chkSumUpActive.IsChecked == true ? "Y" : "N";
+            objSetup.SumUpIsActive = (rgPaymentGateway_10.IsChecked == true && chkPOS7.IsChecked == true) ? "Y" : "N";
+            objSetup.SumUpIsActive = (rgPaymentGateway_10.IsChecked == true && chkPOS7.IsChecked == true) ? "Y" : "N";
             objSetup.SumUpApiKey = (txtSumUpApiKey.Text ?? "").Trim();
             objSetup.SumUpMerchantCode = (txtSumUpMerchantCode.Text ?? "").Trim();
             objSetup.SumUpAffiliateKey = (txtSumUpAffiliateKey.Text ?? "").Trim();
@@ -5389,6 +5393,10 @@ namespace OfflineRetailV2.UserControls.Administrator
             objSetup.SumUpCurrency = string.IsNullOrWhiteSpace(txtSumUpCurrency.Text) ? "GBP" : txtSumUpCurrency.Text.Trim().ToUpper();
             objSetup.SumUpReaderId = (txtSumUpReaderId.Text ?? "").Trim();
             objSetup.SumUpReaderName = (txtSumUpReaderName.Text ?? "").Trim();
+            objSetup.SumUpPairingCode = (txtSumUpPairCode.Text ?? "").Trim();
+            objSetup.SumUpUseCardForm = chkSumUpCardForm.IsChecked == true ? "Y" : "N";
+            objSetup.SumUpUseSoloReader = chkSumUpSolo.IsChecked == true ? "Y" : "N";
+
 
             if (pictPhoto.Source != null)
             {
@@ -5409,6 +5417,17 @@ namespace OfflineRetailV2.UserControls.Administrator
             objSetup.Paymentsense_InstallerId = pay9_psinstallerid.Text == null ? "" : pay9_psinstallerid.Text.Trim();
 
             objSetup.ItemExpiryAlertDay = GeneralFunctions.fnInt32(numAlert.Text);
+
+            SumUpLog("SaveData reached. active=" + objSetup.SumUpIsActive + " merchant=" + objSetup.SumUpMerchantCode + " reader=" + objSetup.SumUpReaderId + " apiKeyLen=" + objSetup.SumUpApiKey.Length);
+            string strSumUpError = objSetup.PostSumUpSettings();
+            SumUpLog("PostSumUpSettings result=[" + strSumUpError + "]");
+            if (strSumUpError != "")
+            {
+                DocMessage.MsgError("SumUp settings could not be saved." + "\r\n" + strSumUpError);
+                return false;
+            }
+            Settings.LoadSumUpSettings();
+
 
             strError = objSetup.PostSetupData();
 
@@ -5472,7 +5491,8 @@ namespace OfflineRetailV2.UserControls.Administrator
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
+            LoadSumUpTab();
+            LoadSumUpPayments();
             txtDBVersion.Text = "DB Version : " + DbDefination.strDbVersion + "  "
                 + "Product Version : " + GeneralFunctions.VersionInfo() + "\n" +
                 "DB Path : " + GeneralFunctions.GetDBFilePath();
@@ -6428,6 +6448,196 @@ namespace OfflineRetailV2.UserControls.Administrator
             OldTabIndex = 11;
         }
 
+        private void TpSumUpList_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            OldTabIndex = 12;
+            LoadSumUpPayments();
+        }
+
+        private void LoadSumUpPayments()
+        {
+            try
+            {
+                grdSumUpPayments.ItemsSource = OfflineRetailV2.SumUp.SumUpPaymentStore.Fetch();
+            }
+            catch (Exception ex)
+            {
+                SumUpLog("LoadSumUpPayments failed: " + ex.Message);
+            }
+        }
+
+        // Opens the sandbox pay form for the selected checkout so it can be paid with a SumUp test card.
+        private void BtnSumUpPayForm_Click(object sender, RoutedEventArgs e)
+        {
+            if (chkSumUpCardForm.IsChecked != true)
+            {
+                DocMessage.MsgInformation("'Card details (sandbox test only)' is turned off in the SumUp settings.");
+                return;
+            }
+            DataRowView row = grdSumUpPayments.GetFocusedRow() as DataRowView;
+            if (row == null)
+            {
+                DocMessage.MsgInformation("Select a row first.");
+                return;
+            }
+            string checkoutId = row["CheckoutId"].ToString();
+            if (checkoutId == "")
+            {
+                DocMessage.MsgInformation("This row has no SumUp checkout.");
+                return;
+            }
+            if (row["Status"].ToString() == "PAID")
+            {
+                DocMessage.MsgInformation("This checkout is already paid.");
+                return;
+            }
+            OfflineRetailV2.SumUp.SumUpPayDialog.Show(this, Convert.ToInt32(row["ID"]), checkoutId,
+                row["CheckoutReference"].ToString(), Convert.ToDecimal(row["Amount"]), row["Currency"].ToString(),
+                row["PayUrl"].ToString(), () => LoadSumUpPayments());
+        }
+
+        // Opens SumUp's hosted payment page for the selected checkout so it can be paid (sandbox: with a test card).
+        private void BtnSumUpOpenPay_Click(object sender, RoutedEventArgs e)
+        {
+            DataRowView row = grdSumUpPayments.GetFocusedRow() as DataRowView;
+            if (row == null)
+            {
+                DocMessage.MsgInformation("Select a row first.");
+                return;
+            }
+            string url = row["PayUrl"].ToString();
+            if (url == "")
+            {
+                DocMessage.MsgInformation("This checkout has no payment page. Only checkouts posted after this update have one.");
+                return;
+            }
+            try { Process.Start(url); }
+            catch (Exception ex) { DocMessage.MsgError("Could not open the payment page." + "\r\n" + ex.Message); }
+        }
+
+        // Re-checks the status of PENDING checkouts and PENDING card reader payments with SumUp, then reloads the list.
+        // A reader payment that turns out PAID was charged although the till did not save the sale: it is reported.
+        private async void BtnSumUpRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            btnSumUpRefresh.IsEnabled = false;
+            string chargedWithoutSale = "";
+            try
+            {
+                Settings.LoadSumUpSettings();
+                if (Settings.SumUpApiKey != "" && Settings.SumUpMerchantCode != "")
+                {
+                    var client = new OfflineRetailV2.SumUp.SumUpClient(Settings.SumUpApiKey, Settings.SumUpMerchantCode);
+                    DataTable dt = OfflineRetailV2.SumUp.SumUpPaymentStore.Fetch();
+                    foreach (DataRow dr in dt.Rows)
+                    {
+                        string status = dr["Status"].ToString();
+                        if (status != "PENDING") continue;
+                        int rowId = Convert.ToInt32(dr["ID"]);
+                        string checkoutId = dr["CheckoutId"].ToString();
+                        string clientTxnId = dr["ClientTransactionId"].ToString();
+                        bool isReader = dr["Method"].ToString() == OfflineRetailV2.SumUp.SumUpReaderPayDialog.MethodReader;
+                        try
+                        {
+                            if (isReader && clientTxnId != "")
+                            {
+                                var t = await client.GetTransactionAsync(clientTxnId);
+                                if (t == null) continue; // SumUp still has no transaction: leave it PENDING
+                                string newStatus = t.Status == "SUCCESSFUL" ? "PAID" : t.Status;
+                                if (newStatus == "" || newStatus == "PENDING") continue;
+                                OfflineRetailV2.SumUp.SumUpPaymentStore.UpdateStatus(rowId, newStatus, t.TransactionCode);
+                                SumUpLog("Re-check reader payment row=" + rowId + " " + status + " -> " + newStatus);
+                                if (newStatus == "PAID" && GeneralFunctions.fnInt32(dr["InvoiceNo"].ToString()) == 0
+                                    && !OfflineRetailV2.SumUp.SumUpPaymentStore.IsReferenceOnSavedSale(dr["CheckoutReference"].ToString()))
+                                    chargedWithoutSale += "\r\n - " + Convert.ToDecimal(dr["Amount"]).ToString("f2") + " " + dr["Currency"]
+                                        + "  code " + t.TransactionCode + "  ref " + dr["CheckoutReference"];
+                            }
+                            else if (checkoutId != "")
+                            {
+                                var co = await client.GetCheckoutAsync(checkoutId);
+                                if (co.Status != "" && co.Status != status)
+                                    OfflineRetailV2.SumUp.SumUpPaymentStore.UpdateStatus(rowId, co.Status, co.TransactionCode);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            SumUpLog("Refresh status failed for row " + rowId + ": " + ex.Message);
+                        }
+                    }
+                }
+                LoadSumUpPayments();
+            }
+            finally
+            {
+                btnSumUpRefresh.IsEnabled = true;
+            }
+
+            if (chargedWithoutSale != "")
+                DocMessage.MsgInformation("SumUp has charged these card payments, but no sale was saved for them:" + chargedWithoutSale
+                    + "\r\n\r\n" + "Select a row and click 'Refund Selected' to give the money back, or keep it if the customer"
+                    + " paid again another way and you ring the sale up manually.");
+        }
+
+        // Refunds the selected card reader payment in full. Meant for payments charged without a saved sale
+        // (Invoice # 0). Refunds of saved sales should go through the POS return, so stock and reports stay right.
+        private async void BtnSumUpRefundSelected_Click(object sender, RoutedEventArgs e)
+        {
+            DataRowView row = grdSumUpPayments.GetFocusedRow() as DataRowView;
+            if (row == null)
+            {
+                DocMessage.MsgInformation("Select a row first.");
+                return;
+            }
+            if (row["Method"].ToString() != OfflineRetailV2.SumUp.SumUpReaderPayDialog.MethodReader || row["Status"].ToString() != "PAID")
+            {
+                DocMessage.MsgInformation("Only a PAID card reader payment can be refunded here." + "\r\n"
+                    + "Click Refresh first if the payment is still PENDING.");
+                return;
+            }
+            int invoiceNo = GeneralFunctions.fnInt32(row["InvoiceNo"].ToString());
+            // Never refund a saved sale from here: check the invoice link and, in case that link failed, CardTrans too.
+            if (invoiceNo != 0 || OfflineRetailV2.SumUp.SumUpPaymentStore.IsReferenceOnSavedSale(row["CheckoutReference"].ToString()))
+            {
+                DocMessage.MsgInformation((invoiceNo != 0 ? "This payment belongs to invoice #" + invoiceNo + "." : "This payment belongs to a saved sale.")
+                    + "\r\n" + "Refund it with a return in the POS, so the items and reports are updated too.");
+                return;
+            }
+            decimal amount = Convert.ToDecimal(row["Amount"]);
+            if (new MessageBoxWindow().Show("Refund " + amount.ToString("f2") + " " + row["Currency"] + " to the customer's card?"
+                    + "\r\n" + "Code " + row["TransactionCode"], "SumUp", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                return;
+
+            btnSumUpRefundSelected.IsEnabled = false;
+            try
+            {
+                Settings.LoadSumUpSettings();
+                var client = new OfflineRetailV2.SumUp.SumUpClient(Settings.SumUpApiKey, Settings.SumUpMerchantCode);
+                var t = await client.GetTransactionAsync(row["ClientTransactionId"].ToString());
+                string txnId = t == null ? "" : (t.Id ?? "");
+                if (txnId == "")
+                {
+                    DocMessage.MsgInformation("The SumUp transaction was not found, so it cannot be refunded here. Use the SumUp dashboard.");
+                    return;
+                }
+                var r = await OfflineRetailV2.SumUp.SumUpRefund.RefundAsync(txnId, amount, 0, row["CheckoutReference"].ToString());
+                SumUpLog("Refund selected row=" + row["ID"] + " txn=" + txnId + " ok=" + r.Success + " err=" + r.Error);
+                if (!r.Success)
+                {
+                    DocMessage.MsgInformation("SumUp refund failed." + "\r\n" + r.Error);
+                    return;
+                }
+                OfflineRetailV2.SumUp.SumUpPaymentStore.UpdateStatus(Convert.ToInt32(row["ID"]), "REFUNDED", row["TransactionCode"].ToString());
+                DocMessage.MsgInformation("SumUp refund completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                DocMessage.MsgInformation("SumUp refund failed: " + ex.Message);
+            }
+            finally
+            {
+                btnSumUpRefundSelected.IsEnabled = true;
+                LoadSumUpPayments();
+            }
+        }
         private void TpSumUp_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             OldTabIndex = 12;
@@ -6450,6 +6660,26 @@ namespace OfflineRetailV2.UserControls.Administrator
             return new OfflineRetailV2.SumUp.SumUpClient(key, merchant);
         }
 
+        // Saves everything on the SumUp panel (including the reader and the pairing code) straight to the database.
+        private string SaveSumUpFromForm()
+        {
+            PosDataObject.Setup objSetup = new PosDataObject.Setup();
+            objSetup.SumUpIsActive = (rgPaymentGateway_10.IsChecked == true && chkPOS7.IsChecked == true) ? "Y" : "N";
+            objSetup.SumUpApiKey = (txtSumUpApiKey.Text ?? "").Trim();
+            objSetup.SumUpMerchantCode = (txtSumUpMerchantCode.Text ?? "").Trim();
+            objSetup.SumUpAffiliateKey = (txtSumUpAffiliateKey.Text ?? "").Trim();
+            objSetup.SumUpAppId = (txtSumUpAppId.Text ?? "").Trim();
+            objSetup.SumUpCurrency = string.IsNullOrWhiteSpace(txtSumUpCurrency.Text) ? "GBP" : txtSumUpCurrency.Text.Trim().ToUpper();
+            objSetup.SumUpReaderId = (txtSumUpReaderId.Text ?? "").Trim();
+            objSetup.SumUpReaderName = (txtSumUpReaderName.Text ?? "").Trim();
+            objSetup.SumUpPairingCode = (txtSumUpPairCode.Text ?? "").Trim();
+            objSetup.SumUpUseCardForm = chkSumUpCardForm.IsChecked == true ? "Y" : "N";
+            objSetup.SumUpUseSoloReader = chkSumUpSolo.IsChecked == true ? "Y" : "N";
+            string err = objSetup.PostSumUpSettings();
+            SumUpLog("SaveSumUpFromForm result=[" + err + "]");
+            if (err == "") Settings.LoadSumUpSettings();
+            return err;
+        }
         private async void BtnSumUpTest_Click(object sender, RoutedEventArgs e)
         {
             var client = CreateSumUpClient();
@@ -6459,7 +6689,15 @@ namespace OfflineRetailV2.UserControls.Administrator
             try
             {
                 var readers = await client.ListReadersAsync();
-                DocMessage.MsgInformation("Connected to SumUp successfully." + "\r\n" + "Readers paired to this merchant: " + readers.Count);
+
+                string strSumUpError = SaveSumUpFromForm();
+                if (strSumUpError != "")
+                {
+                    DocMessage.MsgError("Connected to SumUp, but the settings could not be saved." + "\r\n" + strSumUpError);
+                    return;
+                }
+
+                DocMessage.MsgInformation("Connected to SumUp successfully and settings saved." + "\r\n" + "Readers paired to this merchant: " + readers.Count);
             }
             catch (Exception ex)
             {
@@ -6494,8 +6732,12 @@ namespace OfflineRetailV2.UserControls.Administrator
             {
                 var reader = await client.PairReaderAsync(code, name);
                 txtSumUpReaderId.Text = reader.Id;
-                txtSumUpPairCode.Text = "";
-                DocMessage.MsgInformation("Reader paired (status: " + reader.Status + ")." + "\r\n" + "Click Save to keep these settings.");
+
+                string saveErr = SaveSumUpFromForm();
+                if (saveErr != "")
+                    DocMessage.MsgError("Reader paired (status: " + reader.Status + "), but the settings could not be saved." + "\r\n" + saveErr);
+                else
+                    DocMessage.MsgInformation("Reader paired (status: " + reader.Status + ") and saved.");
             }
             catch (Exception ex)
             {
@@ -6523,7 +6765,13 @@ namespace OfflineRetailV2.UserControls.Administrator
             {
                 await client.DeleteReaderAsync(readerId);
                 txtSumUpReaderId.Text = "";
-                DocMessage.MsgInformation("Reader removed from SumUp." + "\r\n" + "Click Save to keep these settings.");
+                txtSumUpPairCode.Text = "";
+
+                string saveErr = SaveSumUpFromForm();
+                if (saveErr != "")
+                    DocMessage.MsgError("Reader removed from SumUp, but the settings could not be saved." + "\r\n" + saveErr);
+                else
+                    DocMessage.MsgInformation("Reader removed from SumUp and saved.");
             }
             catch (Exception ex)
             {
@@ -7168,6 +7416,27 @@ namespace OfflineRetailV2.UserControls.Administrator
                         {
                             Dispatcher.BeginInvoke(new System.Action(() => { GeneralFunctions.SetFocus(pay10_teyaEmail); }), System.Windows.Threading.DispatcherPriority.Render);
                         }
+                        return false;
+                    }
+                }
+                else if (rgPaymentGateway_10.IsChecked == true)
+                {
+                    if ((txtSumUpApiKey.Text ?? "").Trim() == "")
+                    {
+                        DocMessage.MsgEnter("SumUp API Key");
+                        tcSetup.SelectedIndex = 3;
+                        return false;
+                    }
+                    if ((txtSumUpMerchantCode.Text ?? "").Trim() == "")
+                    {
+                        DocMessage.MsgEnter("SumUp Merchant Code");
+                        tcSetup.SelectedIndex = 3;
+                        return false;
+                    }
+                    if ((chkSumUpCardForm.IsChecked != true) && (chkSumUpSolo.IsChecked != true))
+                    {
+                        DocMessage.MsgInformation("Please turn on at least one SumUp payment method: Card details or Solo card reader.");
+                        tcSetup.SelectedIndex = 3;
                         return false;
                     }
                 }
@@ -7908,6 +8177,7 @@ namespace OfflineRetailV2.UserControls.Administrator
             if (rgPaymentGateway_7.IsChecked == true) objLsetup.ParamValue = "8";
             if (rgPaymentGateway_8.IsChecked == true) objLsetup.ParamValue = "9";
             if (rgPaymentGateway_9.IsChecked == true) objLsetup.ParamValue = "10";
+            if (rgPaymentGateway_10.IsChecked == true) objLsetup.ParamValue = "11";
             objLsetup.LoginUserID = SystemVariables.CurrentUserID;
             if (intCount == 0)
             {
@@ -9673,10 +9943,53 @@ namespace OfflineRetailV2.UserControls.Administrator
                 // MessageBox.Show("Error saving wholesale data: " + result);
             }
         }
+
+        private void ChkSumUpMethod_Checked(object sender, RoutedEventArgs e)
+        {
+            boolControlChanged = true;
+        }
+
+        // Fills the SumUp tab from the saved SumUpInfo row; leaves the form empty when nothing is saved.
+        private void LoadSumUpTab()
+        {
+            try
+            {
+                Settings.LoadSumUpSettings();
+
+                txtSumUpApiKey.Text = Settings.SumUpApiKey;
+                txtSumUpMerchantCode.Text = Settings.SumUpMerchantCode;
+                txtSumUpAffiliateKey.Text = Settings.SumUpAffiliateKey;
+                txtSumUpAppId.Text = Settings.SumUpAppId;
+                txtSumUpCurrency.Text = string.IsNullOrWhiteSpace(Settings.SumUpCurrency) ? "GBP" : Settings.SumUpCurrency;
+                txtSumUpReaderId.Text = Settings.SumUpReaderId;
+                txtSumUpReaderName.Text = Settings.SumUpReaderName;
+                chkSumUpCardForm.IsChecked = Settings.SumUpUseCardForm != "N";
+                chkSumUpSolo.IsChecked = Settings.SumUpUseSoloReader != "N";
+                txtSumUpPairCode.Text = Settings.SumUpPairingCode;
+            }
+            catch (Exception ex)
+            {
+                SumUpLog("LoadSumUpTab failed: " + ex.Message);
+            }
+        }
+
+        private static void SumUpLog(string msg)
+        {
+            try
+            {
+                File.AppendAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SumUpSave.log"),
+                    DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + "  " + msg + "\r\n");
+            }
+            catch { }
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            SumUpLog("Save button clicked");
 
-            if (IsValidAll())
+            bool sumUpValid = IsValidAll();
+            SumUpLog("IsValidAll=" + sumUpValid);
+            if (sumUpValid)
             {
                 if (SaveData())
                 {
@@ -9857,7 +10170,6 @@ namespace OfflineRetailV2.UserControls.Administrator
                 }
             }
         }
-
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             if ((boolChangeStyle) && (SystemVariables.SelectedTheme != cmbstyle.Text))

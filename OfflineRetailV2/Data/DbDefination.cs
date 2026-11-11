@@ -444,6 +444,27 @@ namespace OfflineRetailV2.Data
             // Setup.SubTotalWithQty - show cart quantity beside Sub total
             if (currver <= 111) arlTables.Add("111.0sql1.sql");
 
+            // SumUpInfo table - SumUp card reader settings
+            if (currver <= 112) arlTables.Add("112.0sql1.sql");
+
+            // SumUpInfo.UserID - SumUp settings per user
+            if (currver <= 113) arlTables.Add("113.0sql1.sql");
+
+            // SumUpPayment table - log of amounts posted to SumUp
+            if (currver <= 114) arlTables.Add("114.0sql1.sql");
+
+            // SumUpPayment.PayUrl - hosted payment page link
+            if (currver <= 115) arlTables.Add("115.0sql1.sql");
+
+            // SumUpPayment.Method / ClientTransactionId - card reader payments
+            if (currver <= 116) arlTables.Add("116.0sql1.sql");
+
+            // SumUpInfo.UseCardForm / UseSoloReader - SumUp payment method selection
+            if (currver <= 117) arlTables.Add("117.0sql1.sql");
+
+            // SumUpInfo.PairingCode - last SumUp reader pairing code
+            if (currver <= 118) arlTables.Add("118.0sql1.sql");
+
         }
 
         public static void SetMultilingualArrayList()

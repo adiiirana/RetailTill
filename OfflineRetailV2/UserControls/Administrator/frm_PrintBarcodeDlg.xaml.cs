@@ -838,6 +838,9 @@ namespace OfflineRetailV2.UserControls.Administrator
                     ds.Tables.Add(dtbl);
                     fReport.Report.DataSource = ds;
                     fReport.DataSource = ds;
+                    OfflineRetailV2.Report.Product.OneUp oneUpFromFile = fReport as OfflineRetailV2.Report.Product.OneUp;
+                    if (oneUpFromFile != null)
+                        oneUpFromFile.ApplySampleBarcodeLayout();
 
                     try
                     {
@@ -1039,6 +1042,7 @@ namespace OfflineRetailV2.UserControls.Administrator
                     ds.Tables.Add(dtbl);
                     fReport.Report.DataSource = ds;
                     fReport.DataSource = ds;
+                    rep_PrintLabelJW.ApplySampleBarcodeLayout();
 
                     try
                     {

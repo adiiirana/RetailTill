@@ -5522,7 +5522,6 @@ namespace PosDataObject
                 {
                     strError = UpdateXEROInfo(SaveComm);
                 }
-                strError = SaveSumUpInfo(SaveComm);
 
                 if (blPOSFunctionUpdate)
                     AdjustPOSFunctions(SaveComm);
@@ -10684,7 +10683,6 @@ namespace PosDataObject
 
         #endregion
 
-
         #region SumUp
 
         private string strSumUpIsActive = "N";
@@ -10704,6 +10702,32 @@ namespace PosDataObject
         public string SumUpCurrency { get { return strSumUpCurrency; } set { strSumUpCurrency = value; } }
         public string SumUpReaderId { get { return strSumUpReaderId; } set { strSumUpReaderId = value; } }
         public string SumUpReaderName { get { return strSumUpReaderName; } set { strSumUpReaderName = value; } }
+        private string strSumUpUseCardForm = "Y";
+        private string strSumUpUseSoloReader = "Y";
+        public string SumUpUseCardForm { get { return strSumUpUseCardForm; } set { strSumUpUseCardForm = value; } }
+        public string SumUpUseSoloReader { get { return strSumUpUseSoloReader; } set { strSumUpUseSoloReader = value; } }
+        private string strSumUpPairingCode = "";
+        public string SumUpPairingCode { get { return strSumUpPairingCode; } set { strSumUpPairingCode = value; } }
+
+        // Saved on its own connection so a failure elsewhere in PostSetupData cannot roll the SumUp settings back silently.
+        public string PostSumUpSettings()
+        {
+            using (SqlConnection con = new SqlConnection(SystemVariables.ConnectionString))
+            {
+                try
+                {
+                    con.Open();
+                    using (SqlCommand cmd = new SqlCommand(" ", con))
+                    {
+                        return SaveSumUpInfo(cmd);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return ex.Message;
+                }
+            }
+        }
 
         private string SaveSumUpInfo(SqlCommand objSQlComm)
         {
@@ -10711,21 +10735,23 @@ namespace PosDataObject
             try
             {
                 objSQlComm.Parameters.Clear();
-                objSQlComm.CommandText = " select count(*) from SumUpInfo ";
+                objSQlComm.CommandText = " select count(*) from SumUpInfo where UserID=@UserID ";
+                objSQlComm.Parameters.Add(new SqlParameter("@UserID", System.Data.SqlDbType.Int)).Value = SystemVariables.CurrentUserID;
                 int cnt = Convert.ToInt32(objSQlComm.ExecuteScalar());
 
                 objSQlComm.Parameters.Clear();
                 if (cnt == 0)
                 {
-                    objSQlComm.CommandText = " insert into SumUpInfo(IsActive, ApiKey, MerchantCode, AffiliateKey, AppId, Currency, ReaderId, ReaderName) "
-                        + " values (@IsActive, @ApiKey, @MerchantCode, @AffiliateKey, @AppId, @Currency, @ReaderId, @ReaderName) ";
+                    objSQlComm.CommandText = " insert into SumUpInfo(UserID, IsActive, ApiKey, MerchantCode, AffiliateKey, AppId, Currency, ReaderId, ReaderName, UseCardForm, UseSoloReader, PairingCode) "
+                        + " values (@UserID, @IsActive, @ApiKey, @MerchantCode, @AffiliateKey, @AppId, @Currency, @ReaderId, @ReaderName, @UseCardForm, @UseSoloReader, @PairingCode) ";
                 }
                 else
                 {
                     objSQlComm.CommandText = " update SumUpInfo set IsActive=@IsActive, ApiKey=@ApiKey, MerchantCode=@MerchantCode, AffiliateKey=@AffiliateKey, "
-                        + " AppId=@AppId, Currency=@Currency, ReaderId=@ReaderId, ReaderName=@ReaderName ";
+                        + " AppId=@AppId, Currency=@Currency, ReaderId=@ReaderId, ReaderName=@ReaderName, UseCardForm=@UseCardForm, UseSoloReader=@UseSoloReader, PairingCode=@PairingCode where UserID=@UserID ";
                 }
 
+                objSQlComm.Parameters.Add(new SqlParameter("@UserID", System.Data.SqlDbType.Int)).Value = SystemVariables.CurrentUserID;
                 objSQlComm.Parameters.Add(new SqlParameter("@IsActive", System.Data.SqlDbType.Char)).Value = strSumUpIsActive;
                 objSQlComm.Parameters.Add(new SqlParameter("@ApiKey", System.Data.SqlDbType.NVarChar)).Value = strSumUpApiKey;
                 objSQlComm.Parameters.Add(new SqlParameter("@MerchantCode", System.Data.SqlDbType.NVarChar)).Value = strSumUpMerchantCode;
@@ -10734,6 +10760,9 @@ namespace PosDataObject
                 objSQlComm.Parameters.Add(new SqlParameter("@Currency", System.Data.SqlDbType.NVarChar)).Value = strSumUpCurrency;
                 objSQlComm.Parameters.Add(new SqlParameter("@ReaderId", System.Data.SqlDbType.NVarChar)).Value = strSumUpReaderId;
                 objSQlComm.Parameters.Add(new SqlParameter("@ReaderName", System.Data.SqlDbType.NVarChar)).Value = strSumUpReaderName;
+                objSQlComm.Parameters.Add(new SqlParameter("@UseCardForm", System.Data.SqlDbType.Char)).Value = strSumUpUseCardForm;
+                objSQlComm.Parameters.Add(new SqlParameter("@UseSoloReader", System.Data.SqlDbType.Char)).Value = strSumUpUseSoloReader;
+                objSQlComm.Parameters.Add(new SqlParameter("@PairingCode", System.Data.SqlDbType.NVarChar)).Value = strSumUpPairingCode ?? "";
                 objSQlComm.ExecuteNonQuery();
             }
             catch (SqlException SQLDBException)
@@ -10744,6 +10773,7 @@ namespace PosDataObject
         }
 
         #endregion
+
 
         public DataTable FetchSalesDataForQuickBooksOnline()
         {

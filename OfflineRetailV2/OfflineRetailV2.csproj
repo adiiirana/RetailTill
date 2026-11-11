@@ -535,6 +535,17 @@
       <DependentUpon>rep_TJD.cs</DependentUpon>
     </Compile>
     <Compile Include="SharedData.cs" />
+    <Compile Include="SumUp\SumUpClient.cs" />
+    <Compile Include="SumUp\SumUpPayDialog.cs" />
+    <Compile Include="SumUp\SumUpPaymentStore.cs" />
+    <Compile Include="SumUp\SumUpReaderPayDialog.cs" />
+    <Compile Include="SumUp\SumUpRefund.cs" />
+    <Compile Include="SumUp\frm_SumUpCardDetailsDlg.xaml.cs">
+      <DependentUpon>frm_SumUpCardDetailsDlg.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SumUp\frm_SumUpTransaction.xaml.cs">
+      <DependentUpon>frm_SumUpTransaction.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\Administrator\CloudSyncStatusHelper.cs" />
     <Compile Include="UserControls\Administrator\frm_PrinterTemplateActivationDlg.xaml.cs">
       <DependentUpon>frm_PrinterTemplateActivationDlg.xaml</DependentUpon>
@@ -759,7 +770,6 @@
     <Compile Include="PosDataObject\clsScales.cs" />
     <Compile Include="PosDataObject\clsSecurity.cs" />
     <Compile Include="PosDataObject\clsSetup.cs" />
-    <Compile Include="SumUp\SumUpClient.cs" />
     <Compile Include="PosDataObject\clsShift.cs" />
     <Compile Include="PosDataObject\clsStockJournal.cs" />
     <Compile Include="PosDataObject\clsTax.cs" />
@@ -4428,6 +4438,14 @@
     <Page Include="UserControls\Report\frm_VendorReportDlg.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SumUp\frm_SumUpCardDetailsDlg.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="SumUp\frm_SumUpTransaction.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="XeposExternal\frm_EvoTransaction.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -1645,6 +1645,7 @@ Unchecked="RgCustInfo_0_Checked"/>
 
                                                     <!-- Teya is now left-aligned perfectly in Column 6 underneath Live and Test Mode -->
                                                     <RadioButton Grid.Row="4" Grid.Column="6" Content="Teya" x:Name="rgPaymentGateway_9" GroupName="15" Checked="RgPaymentGateway_0_Checked" Unchecked="RgPaymentGateway_0_Checked"/>
+                                                    <RadioButton Grid.Row="4" Grid.Column="8" Content="SumUp" x:Name="rgPaymentGateway_10" GroupName="15" Checked="RgPaymentGateway_0_Checked" Unchecked="RgPaymentGateway_0_Checked"/>
 
                                                     <dxe:ToggleSwitch ContentPlacement="Far" HorizontalAlignment="Left" Grid.Row="4" Grid.Column="6" CheckedStateContent="Signature Required" UncheckedStateContent="Signature Required" x:Name="chkPrecidiaSign" Visibility="Hidden"/>
                                                 </Grid>
@@ -2054,6 +2055,70 @@ Unchecked="RgCustInfo_0_Checked"/>
                                                                         </Grid>
                                                                     </Grid>
                                                                 </Border>
+                                                            </Grid>
+                                                        </TabItem>
+                                                        <TabItem x:Name="tp10" Header="SumUp">
+                                                            <Grid>
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="3"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="3"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="3"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="6"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                    <RowDefinition Height="6"/>
+                                                                    <RowDefinition Height="Auto"/>
+                                                                </Grid.RowDefinitions>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="13"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                    <ColumnDefinition Width="13"/>
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <ColumnDefinition Width="13"/>
+                                                                    <ColumnDefinition Width="*"/>
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <dxe:ToggleSwitch x:Name="chkSumUpActive" Visibility="Collapsed"/>
+
+                                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="API Key"/>
+                                                                <dxe:PasswordBoxEdit Height="25" Grid.Row="0" Grid.Column="2" x:Name="txtSumUpApiKey" MaxLength="200" GotFocus="Full_GotFocusPswd" LostFocus="Full_LostFocus"/>
+                                                                <TextBlock Grid.Row="0" Grid.Column="4" Text="Merchant Code"/>
+                                                                <dxe:TextEdit Height="25" Grid.Row="0" Grid.Column="6" x:Name="txtSumUpMerchantCode" MaxLength="50" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
+
+                                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Affiliate Key"/>
+                                                                <dxe:PasswordBoxEdit Height="25" Grid.Row="2" Grid.Column="2" x:Name="txtSumUpAffiliateKey" MaxLength="200" GotFocus="Full_GotFocusPswd" LostFocus="Full_LostFocus"/>
+                                                                <TextBlock Grid.Row="2" Grid.Column="4" Text="App ID"/>
+                                                                <dxe:TextEdit Height="25" Grid.Row="2" Grid.Column="6" x:Name="txtSumUpAppId" MaxLength="100" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
+
+                                                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Currency"/>
+                                                                <dxe:TextEdit Height="25" Grid.Row="4" Grid.Column="2" x:Name="txtSumUpCurrency" MaxLength="3" CharacterCasing="Upper" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
+                                                                <TextBlock Grid.Row="4" Grid.Column="4" Text="Reader Name"/>
+                                                                <dxe:TextEdit Height="25" Grid.Row="4" Grid.Column="6" x:Name="txtSumUpReaderName" MaxLength="100" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
+
+                                                                <TextBlock Grid.Row="6" Grid.Column="0" Text="Pairing Code"/>
+                                                                <dxe:TextEdit Height="25" Grid.Row="6" Grid.Column="2" x:Name="txtSumUpPairCode" MaxLength="12" CharacterCasing="Upper" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
+                                                                <TextBlock Grid.Row="6" Grid.Column="4" Text="Reader ID"/>
+                                                                <dxe:TextEdit Height="25" Grid.Row="6" Grid.Column="6" x:Name="txtSumUpReaderId" IsReadOnly="True"/>
+
+                                                                <dxe:ToggleSwitch ContentPlacement="Far" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3" x:Name="chkSumUpCardForm" CheckedStateContent="Card details (sandbox test only)" UncheckedStateContent="Card details (sandbox test only)" ToolTip="Card details popup at the till. Only accepted for a SumUp sandbox account." IsChecked="True" Checked="ChkSumUpMethod_Checked" Unchecked="ChkSumUpMethod_Checked"/>
+                                                                <dxe:ToggleSwitch ContentPlacement="Far" HorizontalAlignment="Left" Grid.Row="8" Grid.Column="4" Grid.ColumnSpan="3" x:Name="chkSumUpSolo" CheckedStateContent="Solo card reader (till payments)" UncheckedStateContent="Solo card reader (till payments)" IsChecked="True" Checked="ChkSumUpMethod_Checked" Unchecked="ChkSumUpMethod_Checked"/>
+
+                                                                <Grid Grid.Row="10" Grid.ColumnSpan="7">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="6"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                        <ColumnDefinition Width="6"/>
+                                                                        <ColumnDefinition Width="*"/>
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <Button Content="Test Connection" Height="30" x:Name="btnSumUpTest" Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpTest_Click"/>
+                                                                    <Button Grid.Column="2" Content="Pair Reader" Height="30" x:Name="btnSumUpPair" Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpPair_Click"/>
+                                                                    <Button Grid.Column="4" Content="Unpair Reader" Height="30" x:Name="btnSumUpUnpair" Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpUnpair_Click"/>
+                                                                </Grid>
                                                             </Grid>
                                                         </TabItem>
 
@@ -4547,118 +4612,64 @@ Click on the  'Retrieve Tokens' button to retrieve Access Token and Refresh Toke
 
 
                     </dx:DXTabItem>
-                    <dx:DXTabItem Header="SumUp" x:Name="tpSumUp" PreviewMouseLeftButtonUp="TpSumUp_PreviewMouseLeftButtonUp" Height="40" Width="175">
+                    <dx:DXTabItem Header="SumUp Transactions" x:Name="tpSumUpList" PreviewMouseLeftButtonUp="TpSumUpList_PreviewMouseLeftButtonUp" Height="40" Width="175">
                         <dx:DXTabItem.HeaderTemplate>
                             <DataTemplate>
-                                <TextBlock Background="Transparent" Text="SumUp" FontFamily="{DynamicResource OSSemiBold}" Style="{DynamicResource TabItemTextD}" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,-9,0,0"  />
+                                <TextBlock Background="Transparent" Text="SumUp Transactions" FontFamily="{DynamicResource OSSemiBold}" Style="{DynamicResource TabItemTextD}" HorizontalAlignment="Center" TextAlignment="Center" Margin="0,-9,0,0"  />
                             </DataTemplate>
                         </dx:DXTabItem.HeaderTemplate>
 
-                        <Grid Width="900">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="2"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
+                        <Grid Width="900" Margin="7,0,7,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="9"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="9"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>
 
-                            <Grid Grid.Column="0" Margin="7,0,7,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="140"></ColumnDefinition>
-                                    <ColumnDefinition Width="9"></ColumnDefinition>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="9"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="9"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="3"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="3"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="3"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="3"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="12"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                </Grid.RowDefinitions>
+                            <Border Grid.Row="0" Style="{DynamicResource GreenBorder}">
+                                <TextBlock Style="{DynamicResource GreenBorderInfo}" Text="Amounts Posted to SumUp"></TextBlock>
+                            </Border>
 
-                                <Border Grid.Row="0" Grid.ColumnSpan="3" Style="{DynamicResource GreenBorder}">
-                                    <TextBlock Style="{DynamicResource GreenBorderInfo}" Text="SumUp Account Setup"></TextBlock>
-                                </Border>
+                            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                                <Button Content="Refresh / Re-check" Height="35" Width="180" x:Name="btnSumUpRefresh"
+                    Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpRefresh_Click"/>
+                                <Button Content="Refund Selected" Height="35" Width="170" Margin="9,0,0,0" x:Name="btnSumUpRefundSelected"
+                    Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpRefundSelected_Click"/>
+                                <Button Content="Open Payment Page" Height="35" Width="200" Margin="9,0,0,0" x:Name="btnSumUpOpenPay"
+                    Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpOpenPay_Click"/>
+                                <Button Content="Pay Checkout (Sandbox Test)" Height="35" Width="240" Margin="9,0,0,0" x:Name="btnSumUpPayForm"
+                    Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpPayForm_Click"/>
+                            </StackPanel>
 
-                                <dxe:ToggleSwitch Grid.Row="2" Grid.ColumnSpan="3" ContentPlacement="Far" HorizontalAlignment="Left" CheckedStateContent="Enable SumUp card payments" UncheckedStateContent="Enable SumUp card payments" x:Name="chkSumUpActive"/>
-
-                                <TextBlock Grid.Row="4" Text="API Key"/>
-                                <dxe:PasswordBoxEdit Grid.Row="4" Grid.Column="2" x:Name="txtSumUpApiKey" MaxLength="200" GotFocus="Full_GotFocusPswd" LostFocus="Full_LostFocus"/>
-
-                                <TextBlock Grid.Row="6" Text="Merchant Code"/>
-                                <dxe:TextEdit Grid.Row="6" Grid.Column="2" x:Name="txtSumUpMerchantCode" MaxLength="50" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
-
-                                <TextBlock Grid.Row="8" Text="Affiliate Key"/>
-                                <dxe:PasswordBoxEdit Grid.Row="8" Grid.Column="2" x:Name="txtSumUpAffiliateKey" MaxLength="200" GotFocus="Full_GotFocusPswd" LostFocus="Full_LostFocus"/>
-
-                                <TextBlock Grid.Row="10" Text="App ID"/>
-                                <dxe:TextEdit Grid.Row="10" Grid.Column="2" x:Name="txtSumUpAppId" MaxLength="100" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
-
-                                <TextBlock Grid.Row="12" Text="Currency"/>
-                                <dxe:TextEdit Grid.Row="12" Grid.Column="2" x:Name="txtSumUpCurrency" MaxLength="3" CharacterCasing="Upper" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
-
-                                <Button Grid.Row="14" Grid.ColumnSpan="3" Content="Test Connection" Height="35" x:Name="btnSumUpTest"
-                                        Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpTest_Click"/>
-                            </Grid>
-
-                            <Grid Grid.Column="2" Margin="7,0,7,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="140"></ColumnDefinition>
-                                    <ColumnDefinition Width="9"></ColumnDefinition>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="9"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="3"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="3"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="12"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                    <RowDefinition Height="12"></RowDefinition>
-                                    <RowDefinition Height="Auto"></RowDefinition>
-                                </Grid.RowDefinitions>
-
-                                <Border Grid.Row="0" Grid.ColumnSpan="3" Style="{DynamicResource PurpleBorder}">
-                                    <TextBlock Style="{DynamicResource PurpleBorderInfo}" Text="Solo Card Reader"></TextBlock>
-                                </Border>
-
-                                <TextBlock Grid.Row="2" Text="Reader Name"/>
-                                <dxe:TextEdit Grid.Row="2" Grid.Column="2" x:Name="txtSumUpReaderName" MaxLength="100" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
-
-                                <TextBlock Grid.Row="4" Text="Pairing Code"/>
-                                <dxe:TextEdit Grid.Row="4" Grid.Column="2" x:Name="txtSumUpPairCode" MaxLength="12" CharacterCasing="Upper" GotFocus="Full_GotFocus" LostFocus="Full_LostFocus"/>
-
-                                <TextBlock Grid.Row="6" Text="Paired Reader ID"/>
-                                <dxe:TextEdit Grid.Row="6" Grid.Column="2" x:Name="txtSumUpReaderId" IsReadOnly="True"/>
-
-                                <Grid Grid.Row="8" Grid.ColumnSpan="3">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="6"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Button Content="Pair Reader" Height="35" x:Name="btnSumUpPair" Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpPair_Click"/>
-                                    <Button Grid.Column="2" Content="Unpair Reader" Height="35" x:Name="btnSumUpUnpair" Style="{DynamicResource GeneralButtonStyle}" Click="BtnSumUpUnpair_Click"/>
-                                </Grid>
-
-                                <TextBlock Grid.Row="10" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow">
-1. On the Solo: Settings &gt; About &gt; Log out, connect to Wi-Fi, then Connections &gt; API &gt; Connect to show the pairing code (valid 5 minutes).<LineBreak/>
-2. Enter the code above and click 'Pair Reader'.<LineBreak/>
-3. Get the API Key, Merchant Code and Affiliate Key/App ID from <Hyperlink NavigateUri="https://developer.sumup.com/" RequestNavigate="Hyperlink_RequestNavigate">developer.sumup.com</Hyperlink> (Settings &gt; For Developers). Use sandbox keys (sup_sk_test_...) for testing.
-                                </TextBlock>
-                            </Grid>
+                            <dxg:GridControl Grid.Row="4" x:Name="grdSumUpPayments" ShowBorder="False" Height="420">
+                                <dxg:GridControl.View>
+                                    <dxg:TableView NavigationStyle="Row" ShowTotalSummary="False" ShowFilterPanelMode="Never"
+                               AllowColumnFiltering="False" AllowEditing="False" AutoWidth="False"/>
+                                </dxg:GridControl.View>
+                                <dxg:GridColumn FieldName="ID" Visible="False"/>
+                                <dxg:GridColumn FieldName="CreatedOn" Header="Date" Width="140">
+                                    <dxg:GridColumn.EditSettings>
+                                        <dxe:TextEditSettings DisplayFormat="dd/MM/yyyy HH:mm"/>
+                                    </dxg:GridColumn.EditSettings>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn FieldName="InvoiceNo" Header="Invoice #" Width="80"/>
+                                <dxg:GridColumn FieldName="Method" Header="Method" Width="90"/>
+                                <dxg:GridColumn FieldName="Amount" Header="Amount" Width="90">
+                                    <dxg:GridColumn.EditSettings>
+                                        <dxe:TextEditSettings DisplayFormat="n2" HorizontalContentAlignment="Right"/>
+                                    </dxg:GridColumn.EditSettings>
+                                </dxg:GridColumn>
+                                <dxg:GridColumn FieldName="Currency" Header="Cur." Width="50"/>
+                                <dxg:GridColumn FieldName="Status" Header="Status" Width="90"/>
+                                <dxg:GridColumn FieldName="CheckoutId" Header="SumUp Checkout ID" Width="290"/>
+                                <dxg:GridColumn FieldName="TransactionCode" Header="Txn Code" Width="110"/>
+                                <dxg:GridColumn FieldName="CheckoutReference" Header="Reference" Width="190"/>
+                                <dxg:GridColumn FieldName="ClientTransactionId" Header="Reader / Original Txn ID" Width="290"/>
+                                <dxg:GridColumn FieldName="ErrorMessage" Header="Error" Width="300"/>
+                                <dxg:GridColumn FieldName="PayUrl" Header="Payment Page" Width="300"/>
+                            </dxg:GridControl>
                         </Grid>
                     </dx:DXTabItem>
                 </dx:DXTabControl>
@@ -4668,3 +4679,4 @@ Click on the  'Retrieve Tokens' button to retrieve Access Token and Refresh Toke
         </Grid>
     </cc:ModalWindow>
 </Window>
+

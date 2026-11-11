@@ -1,4 +1,4 @@
-using DevExpress.Xpf.Editors;
+﻿using DevExpress.Xpf.Editors;
 using DevExpress.Xpf.Editors.Settings;
 using DevExpress.Xpf.Printing;
 using Newtonsoft.Json;
@@ -4364,6 +4364,11 @@ namespace OfflineRetailV2.UserControls.POSSection
                     }
 
 
+                }
+
+                if (pmntgwy == 11) // SumUp: no card-present void, so a removed/cancelled card tender is fully refunded
+                {
+                    returnflag = VoidSumUpCardTender(objcard, val2, val3, val7, val9, val20, val21);
                 }
 
 
@@ -9004,6 +9009,101 @@ namespace OfflineRetailV2.UserControls.POSSection
                         }
                     }
 
+                    if (Settings.PaymentGateway == 11) // SumUp: take the payment before the sale is saved (reader or card details)
+                    {
+                        decimal sumUpAmount = GeneralFunctions.fnDecimal(dblCardAmt.ToString("f2"));
+                        string sumUpReference = "XE-" + intCardTranID + "-" + DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                        Settings.LoadSumUpSettings();
+                        string sumUpMethod = ChooseSumUpMethod(sumUpAmount);
+                        WriteTenderDiag("SumUp payment sent method=" + sumUpMethod + " amount=" + sumUpAmount.ToString("f2") + " ref=" + sumUpReference);
+                        if (sumUpMethod == "")
+                        {
+                            blCardVarify = false;
+                            Cursor = System.Windows.Input.Cursors.Arrow;
+                            break;
+                        }
+
+                        // EVO-style "Card payment" window (like frm_EvoTransaction): starting -> card -> result.
+                        // The SumUp row is logged with invoice 0 and linked to the invoice after the save.
+                        var sumUpTransactionForm = new OfflineRetailV2.SumUp.frm_SumUpTransaction(sumUpAmount, Settings.SumUpCurrency, sumUpReference, sumUpMethod);
+                        blurGrid.Visibility = Visibility.Visible;
+                        try
+                        {
+                            sumUpTransactionForm.ShowDialog();
+                        }
+                        finally
+                        {
+                            blurGrid.Visibility = Visibility.Collapsed;
+                        }
+                        OfflineRetailV2.SumUp.SumUpReaderResult sumUp = sumUpTransactionForm.Result;
+                        WriteTenderDiag("SumUp reader result status=" + sumUp.Status + " code=" + sumUp.TransactionCode
+                            + " txn=" + sumUp.TransactionId + " amount=" + sumUp.Amount.ToString("f2") + " error=" + sumUp.Error);
+
+                        if (!sumUp.Success)
+                        {
+                            // The Card payment window already showed the reason. PENDING needs an explicit warning:
+                            // the card may still have been charged, so the cashier must not simply try again.
+                            if (sumUp.Status == "PENDING")
+                                DocMessage.MsgInformation("SumUp did not confirm this payment." + "\r\n"
+                                    + "Check the SumUp dashboard for reference " + sumUpReference + " before taking the payment again.");
+                            blCardVarify = false;
+                            Cursor = System.Windows.Input.Cursors.Arrow;
+                            break;
+                        }
+
+                        // The card is charged from here on: remember the row so it gets the invoice number after the save.
+                        sumUpPaidPayments.Add(sumUp);
+
+                        foreach (DataRow dra1 in dtblTender.Rows)
+                        {
+                            if ((dra1["TENDER"].ToString() == strCard) && (dra1["CCTRANNO"].ToString() == ""))
+                            {
+                                dra1["CCTRANNO"] = intCardTranID.ToString();
+                                break;
+                            }
+                        }
+
+                        double sumUpCharged = GeneralFunctions.FormatDouble((double)sumUp.Amount);
+                        bool sumUpLessAuthorised = sumUpCharged < dblCardAmt;
+
+                        objcard.CardAmount = sumUpCharged;
+                        objcard.AuthCode = sumUp.TransactionCode;
+                        objcard.Reference = sumUpReference;
+                        objcard.RefCardAuthID = sumUp.TransactionCode;
+                        objcard.RefCardTranID = sumUp.TransactionId;      // needed later for SumUp refunds
+                        objcard.RefCardAuthAmount = sumUpCharged;
+                        objcard.CardTranType = "Sale";
+                        objcard.ID = intCardTranID;
+                        objcard.LoginUserID = SystemVariables.CurrentUserID;
+                        objcard.AdjustFlag = "N";
+                        string sumUpUpdt = objcard.UpdateCardTransOnEvoResponse();
+
+                        if (sumUpUpdt != "")
+                        {
+                            // The card was charged but CardTrans could not be updated: stop and tell the cashier.
+                            WriteTenderDiag("SumUp CardTrans update failed: " + sumUpUpdt);
+                            DocMessage.MsgInformation("The card was charged (SumUp code " + sumUp.TransactionCode + "), but saving the card record failed." + "\r\n" + sumUpUpdt);
+                            blCardVarify = false;
+                            Cursor = System.Windows.Input.Cursors.Arrow;
+                            break;
+                        }
+
+                        drP["PROCESSCARD"] = "Y";
+                        if (sumUpLessAuthorised)
+                        {
+                            // Same as EVO: keep the charged part and let the cashier tender the rest.
+                            DocMessage.MsgInformation("Card only authorized " + SystemVariables.CurrencySymbol + sumUpCharged.ToString("f2"));
+                            drP["AMOUNT"] = sumUpCharged;
+                            blCardVarify = false;
+                            Cursor = System.Windows.Input.Cursors.Arrow;
+                            break;
+                        }
+
+                        blCardVarify = true;
+                        Cursor = System.Windows.Input.Cursors.Arrow;
+                    }
+
 
                     if (Settings.PaymentGateway == 4) // Demo Payment Gateway
                     {
@@ -9068,6 +9168,174 @@ namespace OfflineRetailV2.UserControls.POSSection
             }
 
         }
+
+        #region SumUp
+
+        // Checks the SumUp setup before tendering, like the EVO check. Returns "" when a payment method can be used,
+        // otherwise the message to show. Settings are reloaded because SumUpInfo is stored per user.
+        // The reader settings are required only when the Solo reader is the only method turned on.
+        private string GetSumUpSetupProblem()
+        {
+            Settings.LoadSumUpSettings();
+            bool readerOn = Settings.SumUpUseSoloReader != "N";
+            bool cardOn = Settings.SumUpUseCardForm != "N";
+            string missing = "";
+            if (Settings.SumUpIsActive != "Y") missing += "\r\n - SumUp is not turned on";
+            if (Settings.SumUpApiKey == "") missing += "\r\n - API Key";
+            if (Settings.SumUpMerchantCode == "") missing += "\r\n - Merchant Code";
+            if (Settings.SumUpCurrency == "") missing += "\r\n - Currency";
+            if (!readerOn && !cardOn) missing += "\r\n - a payment method: turn on 'Solo card reader' or 'Card details'";
+            if (readerOn && !cardOn)
+            {
+                if (Settings.SumUpAffiliateKey == "") missing += "\r\n - Affiliate Key";
+                if (Settings.SumUpAppId == "") missing += "\r\n - App ID";
+                if (Settings.SumUpReaderId == "") missing += "\r\n - a paired reader (click Pair Reader)";
+            }
+            if (missing == "") return "";
+            return "Please setup SumUp Payment parameters in General Settings > SumUp"
+                + " for user " + SystemVariables.CurrentUserID + "." + "\r\n" + "Missing:" + missing;
+        }
+
+        private bool IsSumUpReaderReady()
+        {
+            return Settings.SumUpUseSoloReader != "N" && Settings.SumUpReaderId != ""
+                && Settings.SumUpAffiliateKey != "" && Settings.SumUpAppId != "";
+        }
+
+        // Picks the SumUp method from General Settings: reader, card details, or asks when both can be used.
+        // Returns "" when the cashier cancels or nothing can be used.
+        private string ChooseSumUpMethod(decimal amount)
+        {
+            bool readerReady = IsSumUpReaderReady();
+            bool cardOn = Settings.SumUpUseCardForm != "N";
+            if (readerReady && cardOn)
+                return OfflineRetailV2.SumUp.SumUpReaderPayDialog.ChooseMethod(this, amount, Settings.SumUpCurrency);
+            if (readerReady) return OfflineRetailV2.SumUp.SumUpReaderPayDialog.MethodReader;
+            if (cardOn) return OfflineRetailV2.SumUp.SumUpReaderPayDialog.MethodCardForm;
+            DocMessage.MsgInformation(GetSumUpSetupProblem());
+            return "";
+        }
+
+        // SumUp payments approved in this tender but not linked to an invoice yet.
+        private readonly System.Collections.Generic.List<OfflineRetailV2.SumUp.SumUpReaderResult> sumUpPaidPayments
+            = new System.Collections.Generic.List<OfflineRetailV2.SumUp.SumUpReaderResult>();
+
+        // SumUp refunds done in this return but not linked to the return invoice yet.
+        private readonly System.Collections.Generic.List<OfflineRetailV2.SumUp.SumUpRefundResult> sumUpRefunds
+            = new System.Collections.Generic.List<OfflineRetailV2.SumUp.SumUpRefundResult>();
+
+        // Sets SumUpPayment.InvoiceNo for the payments and refunds done before the invoice existed (same idea as SetInvoiceOnXeConnect).
+        private void LinkSumUpPaymentsToInvoice(int invoiceNo)
+        {
+            if (invoiceNo <= 0) return;
+            foreach (OfflineRetailV2.SumUp.SumUpReaderResult p in sumUpPaidPayments)
+            {
+                bool ok = p.PaymentRowId > 0 && OfflineRetailV2.SumUp.SumUpPaymentStore.SetInvoiceNo(p.PaymentRowId, invoiceNo);
+                WriteTenderDiag("SumUp link invoice=" + invoiceNo + " row=" + p.PaymentRowId + " ref=" + p.Reference
+                    + " code=" + p.TransactionCode + " ok=" + ok);
+            }
+            foreach (OfflineRetailV2.SumUp.SumUpRefundResult r in sumUpRefunds)
+            {
+                bool ok = r.PaymentRowId > 0 && OfflineRetailV2.SumUp.SumUpPaymentStore.SetInvoiceNo(r.PaymentRowId, invoiceNo);
+                WriteTenderDiag("SumUp link refund invoice=" + invoiceNo + " row=" + r.PaymentRowId + " txn=" + r.TransactionId + " ok=" + ok);
+            }
+            sumUpPaidPayments.Clear();
+            sumUpRefunds.Clear();
+        }
+
+        // The card was charged on SumUp but the invoice could not be saved: tell the cashier, so the payment is not lost.
+        // The list is kept, so a successful retry of the save still links the payments.
+        private void WarnSumUpChargedWithoutInvoice(string error)
+        {
+            if (sumUpPaidPayments.Count == 0 && sumUpRefunds.Count == 0) return;
+            string lines = "";
+            foreach (OfflineRetailV2.SumUp.SumUpReaderResult p in sumUpPaidPayments)
+                lines += "\r\n - charged " + SystemVariables.CurrencySymbol + p.Amount.ToString("f2") + "  code " + p.TransactionCode + "  ref " + p.Reference;
+            foreach (OfflineRetailV2.SumUp.SumUpRefundResult r in sumUpRefunds)
+                lines += "\r\n - refunded " + SystemVariables.CurrencySymbol + r.Amount.ToString("f2") + "  transaction " + r.TransactionId;
+            WriteTenderDiag("SumUp card done but invoice not saved: " + lines.Replace("\r\n", " ") + " err=" + error);
+            GeneralFunctions.SetTransactionLog("SumUp card done but invoice not saved", lines.Replace("\r\n", " ") + " Err=" + error);
+            DocMessage.MsgInformation("The sale could not be saved, but SumUp has already processed the card:" + lines
+                + "\r\n\r\n" + "Try to save again, or correct it in the SumUp dashboard.");
+        }
+
+        // Called by VoidCC when a SumUp card tender is removed or the tender is cancelled before the sale is saved.
+        // A sale is refunded in full on SumUp; a refund already done for a return cannot be undone, so the cashier is told.
+        // objcard already holds the new CardTrans row inserted by VoidCC (intCardTranID).
+        private bool VoidSumUpCardTender(PosDataObject.POS objcard, string cardAmount, string reference, string authCode,
+            string transactionId, string transactionType, string authAmount)
+        {
+            if (string.Equals(transactionType, "Return", StringComparison.OrdinalIgnoreCase))
+            {
+                WriteTenderDiag("SumUp void skipped for refund txn=" + transactionId);
+                DocMessage.MsgInformation("This card refund was already sent to SumUp and cannot be undone."
+                    + "\r\n" + "If it should not have happened, charge the customer again or correct it in the SumUp dashboard.");
+                return false;
+            }
+
+            double amt = Math.Abs(GeneralFunctions.fnDouble(authAmount));
+            if (amt <= 0) amt = Math.Abs(GeneralFunctions.fnDouble(cardAmount));
+            decimal voidAmount = GeneralFunctions.fnDecimal(amt.ToString("f2"));
+            WriteTenderDiag("SumUp void (refund) sent amount=" + voidAmount.ToString("f2") + " txn=" + transactionId + " ref=" + reference);
+
+            Cursor = System.Windows.Input.Cursors.Wait;
+            blurGrid.Visibility = Visibility.Visible;
+            OfflineRetailV2.SumUp.SumUpRefundResult r;
+            try
+            {
+                var task = Task.Run(() => OfflineRetailV2.SumUp.SumUpRefund.RefundAsync(transactionId, voidAmount, 0, reference));
+                while (!task.Wait(50)) PumpUiDispatcher();
+                r = task.Result;
+            }
+            finally
+            {
+                blurGrid.Visibility = Visibility.Collapsed;
+                Cursor = System.Windows.Input.Cursors.Arrow;
+            }
+            WriteTenderDiag("SumUp void result ok=" + r.Success + " row=" + r.PaymentRowId + " error=" + r.Error);
+
+            if (!r.Success)
+            {
+                // The tender row is removed by the caller either way, so make sure the charge is not forgotten.
+                GeneralFunctions.SetTransactionLog("SumUp void failed", "Txn=" + transactionId + " Ref=" + reference
+                    + " Amount=" + voidAmount.ToString("f2") + " Err=" + r.Error);
+                DocMessage.MsgInformation("The SumUp payment could not be refunded, so the card is still charged "
+                    + SystemVariables.CurrencySymbol + voidAmount.ToString("f2") + " (code " + authCode + ")."
+                    + "\r\n" + r.Error + "\r\n\r\n" + "Refund it in the SumUp dashboard.");
+                return false;
+            }
+
+            // Refunded: this payment no longer belongs to the sale.
+            sumUpPaidPayments.RemoveAll(p => p.TransactionId == transactionId);
+
+            objcard.CardAmount = amt;           // positive with type Void, as EVO stores it
+            objcard.AuthCode = authCode;
+            objcard.Reference = reference;
+            objcard.RefCardAuthID = authCode;
+            objcard.RefCardTranID = transactionId;
+            objcard.RefCardAuthAmount = amt;
+            objcard.CardTranType = "Void";
+            objcard.ID = intCardTranID;
+            objcard.LoginUserID = SystemVariables.CurrentUserID;
+            objcard.AdjustFlag = "Y";
+            string updt = objcard.UpdateCardTransOnEvoResponse();
+            if (updt != "") WriteTenderDiag("SumUp void CardTrans update failed: " + updt);
+            return true;
+        }
+
+        // Shows the SumUp setup problem, if any. Returns false when the tender must stop.
+        private bool CheckSumUpSetupBeforeTender()
+        {
+            if (Settings.PaymentGateway != 11) return true;
+            string problem = GetSumUpSetupProblem();
+            if (problem == "") return true;
+            WriteTenderDiag("SumUp setup check failed: " + problem.Replace("\r\n", " "));
+            DocMessage.MsgInformation(problem);
+            return false;
+        }
+
+        #endregion
+
         private bool ProcessTeyaSale(double amount, out string paymentId, out string gatewayPaymentId, out string errorMessage)
         {
             paymentId = "";
@@ -13795,6 +14063,74 @@ namespace OfflineRetailV2.UserControls.POSSection
                                 break;
                             }
 
+                        }
+
+                        if (pmntgwy == 11) // SumUp: refund the original card payment before the return is saved
+                        {
+                            decimal sumUpRefundAmt = GeneralFunctions.fnDecimal(Math.Abs(dblCardAmt).ToString("f2"));
+                            WriteTenderDiag("SumUp refund sent amount=" + sumUpRefundAmt.ToString("f2") + " txn=" + val9 + " ref=" + val3);
+
+                            Cursor = System.Windows.Input.Cursors.Wait;
+                            blurGrid.Visibility = Visibility.Visible;
+                            OfflineRetailV2.SumUp.SumUpRefundResult sumUpRefund;
+                            try
+                            {
+                                string refundTxnId = val9;
+                                string refundRef = val3;
+                                var refundTask = Task.Run(() => OfflineRetailV2.SumUp.SumUpRefund.RefundAsync(refundTxnId, sumUpRefundAmt, 0, refundRef));
+                                while (!refundTask.Wait(50)) PumpUiDispatcher();
+                                sumUpRefund = refundTask.Result;
+                            }
+                            finally
+                            {
+                                blurGrid.Visibility = Visibility.Collapsed;
+                                Cursor = System.Windows.Input.Cursors.Arrow;
+                            }
+                            WriteTenderDiag("SumUp refund result ok=" + sumUpRefund.Success + " row=" + sumUpRefund.PaymentRowId + " error=" + sumUpRefund.Error);
+
+                            if (!sumUpRefund.Success)
+                            {
+                                DocMessage.MsgInformation("SumUp refund failed." + "\r\n" + sumUpRefund.Error);
+                                blCardVarify = false;
+                                break;
+                            }
+
+                            // The card is refunded from here on: link the log row to the return invoice after the save.
+                            sumUpRefunds.Add(sumUpRefund);
+
+                            foreach (DataRow dra1 in dtblTender.Rows)
+                            {
+                                if ((dra1["TENDER"].ToString() == strCard) && (dra1["CCTRANNO"].ToString() == ""))
+                                {
+                                    dra1["CCTRANNO"] = intCardTranID.ToString();
+                                    break;
+                                }
+                            }
+
+                            objcard.CardAmount = dblCardAmt;
+                            objcard.AuthCode = val7;
+                            objcard.Reference = val3;
+                            objcard.RefCardAuthID = val7;
+                            objcard.RefCardTranID = val9;
+                            objcard.RefCardAuthAmount = dblCardAmt;
+                            objcard.CardTranType = "Return";
+                            objcard.ID = intCardTranID;
+                            objcard.AdjustFlag = "Y";
+                            objcard.LoginUserID = SystemVariables.CurrentUserID;
+                            string sumUpUpdt = objcard.UpdateCardTransOnEvoResponse();
+                            drP["PROCESSCARD"] = "Y";
+
+                            if (sumUpUpdt != "")
+                            {
+                                WriteTenderDiag("SumUp refund CardTrans update failed: " + sumUpUpdt);
+                                DocMessage.MsgInformation("The card was refunded on SumUp, but saving the card record failed." + "\r\n" + sumUpUpdt);
+                                blCardVarify = false;
+                                break;
+                            }
+
+                            blCardVarify = true;
+                            // One refund per tender row: do not refund again for other card rows of the original sale.
+                            break;
                         }
 
                         if (pmntgwy == 9)
@@ -19347,6 +19683,8 @@ namespace OfflineRetailV2.UserControls.POSSection
                 {
                     if (Settings.POSCardPayment == "Y")
                     {
+                        if (!CheckSumUpSetupBeforeTender()) return; // SumUp (gateway 11)
+
                         if (Settings.PaymentGateway == 1)
                         {
                             if (Settings.ElementHPAccountID == "")
@@ -19860,6 +20198,8 @@ namespace OfflineRetailV2.UserControls.POSSection
                 srterrmsg = objpos.ErrorMsg ?? "";
                 if (!boolInvoiceCreated && string.IsNullOrEmpty(srterrmsg))
                     srterrmsg = "Invoice could not be created.";
+                if (boolInvoiceCreated) LinkSumUpPaymentsToInvoice(intINV);
+                else WarnSumUpChargedWithoutInvoice(srterrmsg);
                 if (boolInvoiceCreated && srterrmsg == "")
                 {
                     DataTable dtblXeConnectUpdate = grdTender.ItemsSource as DataTable;
@@ -24046,6 +24386,8 @@ namespace OfflineRetailV2.UserControls.POSSection
 
                         if (Settings.POSCardPayment == "Y")
                         {
+                            if (!CheckSumUpSetupBeforeTender()) return; // SumUp (gateway 11)
+
                             if (Settings.PaymentGateway == 1)
                             {
                                 if (Settings.ElementHPAccountID == "")
@@ -25023,6 +25365,8 @@ namespace OfflineRetailV2.UserControls.POSSection
                         {
                             PaidInOutTranId = createdLayTran;
                         }
+                        // SumUp is no longer offered after the save: the reader payment is taken in CardVarify() first.
+
                     }
                     else
                     {
@@ -25117,6 +25461,9 @@ namespace OfflineRetailV2.UserControls.POSSection
                     srterrmsg = objpos.ErrorMsg ?? "";
                     if (!boolInvoiceCreated && string.IsNullOrEmpty(srterrmsg))
                         srterrmsg = "Invoice could not be created.";
+
+                    if (boolInvoiceCreated) LinkSumUpPaymentsToInvoice(intINV);
+                    else WarnSumUpChargedWithoutInvoice(srterrmsg);
 
                     if (boolInvoiceCreated && srterrmsg == "")
                     {

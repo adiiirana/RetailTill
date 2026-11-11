@@ -6025,7 +6025,7 @@ namespace OfflineRetailV2.UserControls.POSSection
                     RefundButton.Visibility = Visibility.Visible;
                     VoidReceipt.Visibility = Visibility.Visible;
                 }
-                else if (Settings.PaymentGateway == 10)
+                else if ((Settings.PaymentGateway == 10) || (Settings.PaymentGateway == 11)) // Teya, SumUp: refund only
                 {
                     RefundButton.Visibility = Visibility.Visible;
                     VoidReceipt.Visibility = Visibility.Collapsed;
@@ -6075,6 +6075,17 @@ namespace OfflineRetailV2.UserControls.POSSection
                         if (teyaRefundSuccess)
                         {
                             DocMessage.MsgInformation("Teya refund completed successfully.");
+                            if (blFetch) await FetchHeaderData();
+                        }
+                        return;
+                    }
+
+                    if (Settings.PaymentGateway == 11)
+                    {
+                        bool sumUpRefundSuccess = await ProcessSumUpRefundAsync(selectedInvoiceNumber, amount);
+                        if (sumUpRefundSuccess)
+                        {
+                            DocMessage.MsgInformation("SumUp refund completed successfully.");
                             if (blFetch) await FetchHeaderData();
                         }
                         return;
@@ -7417,6 +7428,11 @@ namespace OfflineRetailV2.UserControls.POSSection
                         DocMessage.MsgInformation("Card void is not available for Teya. Use REFUND (Card) instead.");
                         return;
                     }
+                    if (Settings.PaymentGateway == 11)
+                    {
+                        DocMessage.MsgInformation("Card void is not available for SumUp. Use REFUND (Card) instead.");
+                        return;
+                    }
 
                     try
                     {
@@ -7631,6 +7647,43 @@ namespace OfflineRetailV2.UserControls.POSSection
             finally
             {
                 UpdateTeyaRefundProgress("");
+            }
+        }
+
+        // Refunds a SumUp card sale from the return/reprint screen. Like Teya, this refunds the card only.
+        private async Task<bool> ProcessSumUpRefundAsync(int invoiceId, decimal amount)
+        {
+            try
+            {
+                UpdateTeyaRefundProgress("Connecting to SumUp...");
+                int transactionNo = GetTranID(invoiceId);
+                DataTable dt = transactionNo > 0 ? GetCardTransData(transactionNo) : null;
+                string transactionId = OfflineRetailV2.SumUp.SumUpRefund.FindSaleTransactionId(dt);
+                if (transactionId == "")
+                {
+                    UpdateTeyaRefundProgress("");
+                    DocMessage.MsgInformation("SumUp payment not found for this invoice. Please ensure this invoice was paid on the SumUp card reader.");
+                    return false;
+                }
+
+                UpdateTeyaRefundProgress("Submitting refund...");
+                OfflineRetailV2.SumUp.SumUpRefundResult r = await OfflineRetailV2.SumUp.SumUpRefund.RefundAsync(
+                    transactionId, Math.Abs(amount), invoiceId, "INV-" + invoiceId);
+                GeneralFunctions.SetTransactionLog("SumUp refund", "Invoice=" + invoiceId + " Amount=" + Math.Abs(amount).ToString("f2")
+                    + " Txn=" + transactionId + " Ok=" + r.Success + " Err=" + r.Error);
+                UpdateTeyaRefundProgress("");
+                if (!r.Success)
+                {
+                    DocMessage.MsgInformation("SumUp refund failed." + "\r\n" + r.Error);
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                UpdateTeyaRefundProgress("");
+                DocMessage.MsgInformation("SumUp refund failed: " + ex.Message);
+                return false;
             }
         }
 
