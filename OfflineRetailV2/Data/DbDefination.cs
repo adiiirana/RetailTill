@@ -10,7 +10,7 @@ namespace OfflineRetailV2.Data
     {
         public static ArrayList arlLanguageTables = new ArrayList();
         public static ArrayList arlTables = new ArrayList();
-        public static string strDbVersion = "111.000"; // DB Version
+        public static string strDbVersion = "118.000"; // DB Version (must equal the highest script number below)
 
         // add script files
 
@@ -436,13 +436,20 @@ namespace OfflineRetailV2.Data
             if (currver <= 108) arlTables.Add("108.0sql1.sql");
             if (currver <= 108) arlTables.Add("108.0sql2.sql");
 
-            if (currver <= 109) arlTables.Add("109.0sql2.sql");
+            //if (currver <= 109) arlTables.Add("109.0sql2.sql");
 
             // Setup.IsWholesaleActive - required by General Settings save
             if (currver <= 110) arlTables.Add("110.0sql1.sql");
 
             // Setup.SubTotalWithQty - show cart quantity beside Sub total
             if (currver <= 111) arlTables.Add("111.0sql1.sql");
+            if (currver <= 112) arlTables.Add("112.0sql1.sql");
+            if (currver <= 113) arlTables.Add("113.0sql1.sql");
+            if (currver <= 114) arlTables.Add("114.0sql1.sql");
+            if (currver <= 115) arlTables.Add("115.0sql1.sql");
+            if (currver <= 116) arlTables.Add("116.0sql1.sql");
+            if (currver <= 117) arlTables.Add("117.0sql1.sql");
+            if (currver <= 118) arlTables.Add("118.0sql1.sql");
 
         }
 

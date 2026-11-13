@@ -5522,7 +5522,8 @@ namespace PosDataObject
                 {
                     strError = UpdateXEROInfo(SaveComm);
                 }
-                strError = SaveSumUpInfo(SaveComm);
+                string strSumUpError = SaveSumUpInfo(SaveComm);
+                if (strError == "") strError = strSumUpError;
 
                 if (blPOSFunctionUpdate)
                     AdjustPOSFunctions(SaveComm);
@@ -10726,19 +10727,19 @@ namespace PosDataObject
                         + " AppId=@AppId, Currency=@Currency, ReaderId=@ReaderId, ReaderName=@ReaderName ";
                 }
 
-                objSQlComm.Parameters.Add(new SqlParameter("@IsActive", System.Data.SqlDbType.Char)).Value = strSumUpIsActive;
-                objSQlComm.Parameters.Add(new SqlParameter("@ApiKey", System.Data.SqlDbType.NVarChar)).Value = strSumUpApiKey;
-                objSQlComm.Parameters.Add(new SqlParameter("@MerchantCode", System.Data.SqlDbType.NVarChar)).Value = strSumUpMerchantCode;
-                objSQlComm.Parameters.Add(new SqlParameter("@AffiliateKey", System.Data.SqlDbType.NVarChar)).Value = strSumUpAffiliateKey;
-                objSQlComm.Parameters.Add(new SqlParameter("@AppId", System.Data.SqlDbType.NVarChar)).Value = strSumUpAppId;
-                objSQlComm.Parameters.Add(new SqlParameter("@Currency", System.Data.SqlDbType.NVarChar)).Value = strSumUpCurrency;
-                objSQlComm.Parameters.Add(new SqlParameter("@ReaderId", System.Data.SqlDbType.NVarChar)).Value = strSumUpReaderId;
-                objSQlComm.Parameters.Add(new SqlParameter("@ReaderName", System.Data.SqlDbType.NVarChar)).Value = strSumUpReaderName;
+                objSQlComm.Parameters.Add(new SqlParameter("@IsActive", System.Data.SqlDbType.Char)).Value = string.IsNullOrEmpty(strSumUpIsActive) ? "N" : strSumUpIsActive;
+                objSQlComm.Parameters.Add(new SqlParameter("@ApiKey", System.Data.SqlDbType.NVarChar)).Value = strSumUpApiKey ?? "";
+                objSQlComm.Parameters.Add(new SqlParameter("@MerchantCode", System.Data.SqlDbType.NVarChar)).Value = strSumUpMerchantCode ?? "";
+                objSQlComm.Parameters.Add(new SqlParameter("@AffiliateKey", System.Data.SqlDbType.NVarChar)).Value = strSumUpAffiliateKey ?? "";
+                objSQlComm.Parameters.Add(new SqlParameter("@AppId", System.Data.SqlDbType.NVarChar)).Value = strSumUpAppId ?? "";
+                objSQlComm.Parameters.Add(new SqlParameter("@Currency", System.Data.SqlDbType.NVarChar)).Value = string.IsNullOrEmpty(strSumUpCurrency) ? "GBP" : strSumUpCurrency;
+                objSQlComm.Parameters.Add(new SqlParameter("@ReaderId", System.Data.SqlDbType.NVarChar)).Value = strSumUpReaderId ?? "";
+                objSQlComm.Parameters.Add(new SqlParameter("@ReaderName", System.Data.SqlDbType.NVarChar)).Value = strSumUpReaderName ?? "";
                 objSQlComm.ExecuteNonQuery();
             }
-            catch (SqlException SQLDBException)
+            catch (Exception ex)
             {
-                strErrMsg = SQLDBException.Message;
+                strErrMsg = "SumUp settings could not be saved." + "\r\n" + ex.Message;
             }
             return strErrMsg;
         }

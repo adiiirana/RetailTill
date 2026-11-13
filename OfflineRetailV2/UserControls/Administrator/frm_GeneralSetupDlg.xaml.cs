@@ -5465,6 +5465,7 @@ namespace OfflineRetailV2.UserControls.Administrator
                         Settings.AddInApplicationLogs(SystemVariables.CurrentUserCode, GeneralFunctions.GetHostName(), Settings.Event10, "Failed", "");
                     }
                 }
+                DocMessage.MsgError("Settings could not be saved." + "\r\n" + strError);
                 return false;
             }
         }

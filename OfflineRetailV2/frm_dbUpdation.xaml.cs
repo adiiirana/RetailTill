@@ -39,6 +39,7 @@ namespace OfflineRetailV2
     {
         private SqlConnection sqlConn;
         private string strVersion = "0";
+        private readonly List<string> UpdateErrors = new List<string>();
         public string strDbVersionResult = "OK";
         private SqlConnection Connection
         {
@@ -173,9 +174,14 @@ namespace OfflineRetailV2
                     {
                         ExecuteSql(SystemVariables.Conn, AppPath + WorkArray[intTableCount].ToString());
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        UpdateErrors.Add(WorkArray[intTableCount].ToString() + ": " + ex.Message);
                     }
+                }
+                else
+                {
+                    UpdateErrors.Add(WorkArray[intTableCount].ToString() + ": script file not found in " + AppPath);
                 }
 
                 try
@@ -204,6 +210,12 @@ namespace OfflineRetailV2
                 sql = reader.ReadToEnd();
             }
 
+
+            // Older scripts hard-code Retail2020DB ("USE Retail2020DB", "[Retail2020DB].[dbo].[...]").
+            // Point them at the database this connection actually uses, so another DB (e.g. Retail2021DB) is updated.
+            string targetDb = new SqlConnectionStringBuilder(connection.ConnectionString).InitialCatalog;
+            if (!string.IsNullOrEmpty(targetDb))
+                sql = Regex.Replace(sql, @"\bRetail2020DB\b", targetDb, RegexOptions.IgnoreCase);
 
             Regex regex = new Regex("^GO", RegexOptions.IgnoreCase | RegexOptions.Multiline);
             string[] lines = regex.Split(sql);
@@ -415,13 +427,23 @@ namespace OfflineRetailV2
             catch (SqlException SQLDBException)
             {
                 strError = SQLDBException.Message.ToString();
+                // Older DbVersion tables have no IsUpdated / UpdatedDate columns; still record the version.
+                try
+                {
+                    sqlComm = new SqlCommand("UPDATE DbVersion SET CurrentVersion = " + DbDefination.strDbVersion, sqlConn);
+                    sqlComm.ExecuteNonQuery();
+                }
+                catch (SqlException ex)
+                {
+                    UpdateErrors.Add("DbVersion: " + ex.Message);
+                }
             }
 
             sqlConn.Close();
             sqlComm.Dispose();
         }
 
-        // Check Record Count of Db Version 
+        // Check Record Count of Db Version
 
         private bool HasDbVersionData()
         {
@@ -501,6 +523,14 @@ namespace OfflineRetailV2
                 Cursor = Cursors.Arrow;
             }
 
+            if (UpdateErrors.Count > 0)
+            {
+                string logFile = System.IO.Path.Combine(GeneralFunctions.GetUserDataDirectory(), "DbUpdateErrors.log");
+                try { File.WriteAllLines(logFile, UpdateErrors); } catch { }
+                new MessageBoxWindow().Show("Some database scripts failed (" + UpdateErrors.Count + "):" + "\n"
+                    + string.Join("\n", UpdateErrors.Take(10)) + "\n\n" + "Full list: " + logFile,
+                    "Database Update", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
 
             DialogResult = true;
         }
